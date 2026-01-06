@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction History</title>
+    <style>
+        body { font-family: Arial; background:#0f172a; color:white; }
+        table { width:100%; border-collapse: collapse; margin-top:20px; }
+        th, td { padding:10px; border:1px solid #334155; text-align:center; }
+        th { background:#2563eb; }
+        tr:nth-child(even){ background:#1e293b; }
+    </style>
+</head>
+<body>
+
+<h1>📊 RainCast Prediction History</h1>
+
+{% if records %}
+<table>
+    <tr>
+        <th>Date</th>
+        <th>City</th>
+        <th>Temp (°C)</th>
+        <th>Humidity</th>
+        <th>Pressure</th>
+        <th>Wind</th>
+        <th>ML Prediction</th>
+        <th>API Rain</th>
+    </tr>
+
+    {% for row in records %}
+    <tr>
+        {% for col in row %}
+        <td>{{ col }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No history available yet.</p>
+{% endif %}
+
+</body>
+</html>
