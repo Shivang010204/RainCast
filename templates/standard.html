@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Life | RainCast AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="dashboard" style="margin-left: 0; padding: 40px;">
+        <a href="/?city={{ city }}" style="color: #3b82f6; text-decoration: none;">← Back to Dashboard</a>
+        <h1>🏠 Daily Lifestyle Insights</h1>
+        <p>City: <b>{{ city }}</b></p>
+
+        <div class="dashboard-grid">
+            <div class="glass-card" style="text-align: center;">
+                <h3>RealFeel™ Index</h3>
+                <h1 style="font-size: 3rem;">32°C</h1>
+                <p>It feels warmer than the actual temp due to 65% humidity.</p>
+            </div>
+
+            <div class="glass-card">
+                <h3>Commute & Traffic</h3>
+                <p>🚗 <b>Traffic:</b> Expect 15-min delays in low-lying areas.</p>
+                <p>🚲 <b>Two-Wheelers:</b> Carry rain gear; roads may be slippery.</p>
+                <p>🏃 <b>Outdoor Sports:</b> Not recommended after 4:00 PM.</p>
+            </div>
+        </div>
+
+        <div class="glass-card" style="margin-top: 20px;">
+            <h3>Health & Wellness</h3>
+            <p>💧 <b>Hydration:</b> High humidity detected. Drink 500ml more water than usual.</p>
+            <p>👕 <b>Clothing:</b> Light cotton fabrics recommended.</p>
+        </div>
+    </div>
+</body>
+</html>

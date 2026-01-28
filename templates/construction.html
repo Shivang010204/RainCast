@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Construction Portal | RainCast AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="dashboard" style="margin-left: 0; padding: 40px;">
+        <a href="/?city={{ city }}" style="color: #3b82f6; text-decoration: none;">← Back to Dashboard</a>
+        <h1>🏗️ Construction Safety Monitor</h1>
+        <p>Site Location: <b>{{ city }}</b></p>
+
+        <div class="dashboard-grid">
+            <div class="glass-card">
+                <h3>Concrete Curing Alert</h3>
+                <p>Humidity is high. Concrete setting time will be extended by approximately 4 hours. Ensure proper covering if rain begins.</p>
+                <div style="background: #3b82f6; height: 10px; width: 60%; border-radius: 5px; margin-top: 10px;"></div>
+                <small>Current Workability: 60%</small>
+            </div>
+
+            <div class="glass-card">
+                <h3>Wind & Height Safety</h3>
+                <p>Current Wind: 12 km/h</p>
+                <p style="color: #4ade80;">✅ Crane operations are safe.</p>
+                <p style="color: #4ade80;">✅ Scaffolding work permitted.</p>
+            </div>
+        </div>
+
+        <div class="glass-card" style="margin-top: 20px; border-left: 5px solid #f59e0b;">
+            <h3 style="color: #f59e0b;">⚠️ Material Protection Notice</h3>
+            <p>Rain prediction is active. Please ensure all cement bags and electrical equipment are elevated at least 6 inches off the ground and covered with waterproof tarps.</p>
+        </div>
+    </div>
+</body>
+</html>

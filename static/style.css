@@ -1,0 +1,62 @@
+:root { --bg: #0f172a; --card: rgba(255, 255, 255, 0.05); --primary: #3b82f6; }
+
+body { background: var(--bg); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; }
+
+.main-wrapper { display: flex; min-height: 100vh; padding: 20px; gap: 20px; }
+
+.sidebar { width: 260px; background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+
+.mode-btn { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: white; cursor: pointer; text-align: left; transition: 0.3s; }
+.mode-btn.active { background: var(--primary); border: none; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5); }
+
+.dashboard { flex: 1; }
+.search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+.search-box input { flex: 1; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; }
+.search-box button { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+
+.glass-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+#map { height: 280px; border-radius: 15px; margin-top: 15px; border: 2px solid rgba(255,255,255,0.1); }
+
+.community-alert { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 15px; border-radius: 12px; margin-bottom: 25px; animation: flash 2s infinite; }
+@keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+.tips-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-top: 15px; }
+
+.report-btns button { padding: 10px 15px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; margin-right: 8px; }
+.btn-rain { background: #3b82f6; color: white; }
+.btn-clear { background: #10b981; color: white; }
+.history-btn { color: #3b82f6; text-decoration: none; font-weight: bold; }
+
+/* Ensure the <a> tags in the sidebar look like the original buttons */
+.mode-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    text-align: center;
+    text-decoration: none; /* Removes the underline */
+    font-size: 0.9rem;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.mode-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+.mode-btn.active {
+    background: #3b82f6;
+    font-weight: 600;
+}
+
+/* Optional: Add the "Rain Glow" effect we added to the dashboard */
+.rain-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    border: 1px solid rgba(59, 130, 246, 0.5) !important;
+}

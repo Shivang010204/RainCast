@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Farmer Portal | RainCast AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+        .stat-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .safe { background: #059669; color: white; }
+        .danger { background: #dc2626; color: white; }
+    </style>
+</head>
+<body>
+    <div class="dashboard" style="margin-left: 0; padding: 40px;">
+        <a href="/?city={{ city }}" style="color: #3b82f6; text-decoration: none;">← Back to Dashboard</a>
+        <h1>🚜 Agriculture Decision Support</h1>
+        <p>Expert analysis for <b>{{ city }}</b></p>
+
+        <div class="grid-3">
+            <div class="stat-box">
+                <h4>Pesticide Spray Window</h4>
+                <p>Status: <span class="badge safe">Optimal</span></p>
+                <small>Wind speeds are low. Drift risk is minimal.</small>
+            </div>
+            <div class="stat-box">
+                <h4>Sowing Suitability</h4>
+                <h2>88%</h2>
+                <small>Soil moisture and temp are ideal for planting.</small>
+            </div>
+            <div class="stat-box">
+                <h4>Irrigation Need</h4>
+                <p>Status: <span class="badge danger">Postpone</span></p>
+                <small>Rain expected within 24hrs. Save water.</small>
+            </div>
+        </div>
+
+        <div class="glass-card" style="margin-top: 30px;">
+            <h3>Expert Farmer's Checklist</h3>
+            <ul style="line-height: 2;">
+                <li>✅ Clear drainage channels to prevent waterlogging.</li>
+                <li>✅ Secure greenhouse coverings against potential gusts.</li>
+                <li>❌ Avoid nitrogen fertilizer application today.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

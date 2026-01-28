@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RainCast | History Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .mode-tag { background: #334155; padding: 4px 10px; border-radius: 5px; font-size: 0.8rem; text-transform: capitalize; }
+    </style>
+</head>
+<body style="padding: 40px;">
+    <div class="glass-card" style="max-width: 1000px; margin: auto;">
+        <a href="/" class="history-btn">← Back to Dashboard</a>
+        <h1 style="text-align: center;">System Logs</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th><th>City</th><th>Prediction</th><th>Mode</th><th>User Report</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in records %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td><b>{{ row[1] }}</b></td>
+                    <td style="color: #3b82f6;">{{ row[6] }}</td>
+                    <td><span class="mode-tag">{{ row[9] }}</span></td>
+                    <td>{{ row[8] or 'No Report' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RainCast AI | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.6">
+</head>
+<body>
+<div class="main-wrapper">
+    <aside class="sidebar">
+        <div class="sidebar-logo">🌧 RainCast</div>
+        <nav>
+            <a href="/?user_mode=standard&city={{ weather.city if weather else '' }}" 
+               class="mode-btn {% if current_mode == 'standard' %}active{% endif %}" 
+               style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
+               🏠 Standard
+            </a>
+            
+            <a href="/?user_mode=farmer&city={{ weather.city if weather else '' }}" 
+               class="mode-btn {% if current_mode == 'farmer' %}active{% endif %}" 
+               style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
+               🚜 Farmer
+            </a>
+            
+            <a href="/?user_mode=construction&city={{ weather.city if weather else '' }}" 
+               class="mode-btn {% if current_mode == 'construction' %}active{% endif %}" 
+               style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
+               🏗️ Construction
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="/clear" class="clear-btn" style="color: #f87171; font-size: 0.8rem; text-decoration: none; display: block; margin-bottom: 10px;">🧹 Clear Search History</a>
+            <a href="/history" class="history-btn">📊 Prediction History</a>
+        </div>
+    </aside>
+
+    <main class="dashboard">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Smart Weather Hub</h1>
+            <div id="live-clock" style="font-size: 0.9rem; color: rgba(255,255,255,0.6);"></div>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="flash-success" style="background: rgba(74, 222, 128, 0.2); border: 1px solid #4ade80; color: #4ade80; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                  ✔️ {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="search-box">
+            <input type="text" name="city" placeholder="Enter City (e.g. Ahmedabad, Mumbai)..." value="{{ weather.city if weather else '' }}" required>
+            <input type="hidden" name="user_mode" id="user_mode" value="{{ current_mode }}">
+            <button type="submit">Analyze Forecast</button>
+        </form>
+
+        {% if community_report %}
+        <div class="community-alert">
+            🔴 <b>LIVE ALERT:</b> Users recently reported <b>{{ community_report }}</b> in this area!
+        </div>
+        {% endif %}
+
+        {% if error %}<p class="error-msg">{{ error }}</p>{% endif %}
+
+        {% if weather %}
+        <div class="dashboard-grid">
+            <div class="glass-card">
+                <h2>{{ weather.city }}</h2>
+                <div class="mini-stats">
+                    <span>🌡 {{ weather.temp }}°C</span> | <span>💧 {{ weather.hum }}% Humidity</span>
+                </div>
+                <div id="map" style="height: 300px; border-radius: 15px; margin-top: 15px;"></div>
+            </div>
+
+            <div class="glass-card {% if prediction == 'Rain Expected' %}rain-glow{% endif %}">
+                <h3>🤖 AI Prediction: <span style="color: #3b82f6;">{{ prediction }}</span></h3>
+                
+                <div class="advice-list">
+                    <p><b>Sector:</b> {{ advice.sector or 'General' }}</p>
+                    <div class="tips-box">
+                        <p style="color: #4ade80;">✅ <b>Recommended:</b> {{ advice.dos }}</p>
+                    </div>
+                </div>
+
+                <a href="/{{ current_mode }}?city={{ weather.city }}" class="view-details-btn" style="display: block; background: #3b82f6; color: white; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 600; margin-top: 15px;">
+                    🚀 View Detailed {{ current_mode|title }} Analysis
+                </a>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+
+                <div class="report-section">
+                    <p>Is it actually raining? Help your community:</p>
+                    <form action="/report" method="POST" class="report-btns" style="display: flex; gap: 10px; margin-top: 10px;">
+                        <input type="hidden" name="city" value="{{ weather.city }}">
+                        <input type="hidden" name="lat" value="{{ weather.lat }}">
+                        <input type="hidden" name="lon" value="{{ weather.lon }}">
+                        
+                        <button type="submit" name="status" value="Rain" class="btn-rain" style="flex: 1; background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">🌧 Raining</button>
+                        <button type="submit" name="status" value="No Rain" class="btn-clear" style="flex: 1; background: #10b981; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">☀️ Clear</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // 1. Live Clock Logic
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-clock').innerText = now.toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 2. Map Rendering Logic
+    {% if weather %}
+        var map = L.map('map').setView([{{ weather.lat }}, {{ weather.lon }}], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        L.marker([{{ weather.lat }}, {{ weather.lon }}]).addTo(map)
+            .bindPopup("<b>AI Forecast:</b> {{ prediction }}")
+            .openPopup();
+
+        {% for row in records %}
+            {% if row[8] == 'Rain' and row|length > 11 and row[10] != "" %}
+                L.circle([{{ row[10] }}, {{ row[11] }}], {
+                    color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.4, radius: 500
+                }).addTo(map).bindPopup("<b>Community Report:</b> Heavy Rain Observed");
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</script>
+</body>
+</html>
