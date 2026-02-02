@@ -1,19 +1,2 @@
 Time,City,Temp,Hum,Press,Wind,ML,API,Report,Mode,Lat,Lon
-2026-01-28 14:51:43,Delhi,16.05,82,1018,2.06,No Rain,OK,,standard,28.6667,77.2167
-2026-01-28 14:52:27,Delhi,16.05,82,1018,2.06,No Rain,OK,,standard,28.6667,77.2167
-2026-01-28 14:53:23,Delhi,16.05,82,1018,2.06,No Rain,OK,,farmer,28.6667,77.2167
-2026-01-28 14:54:01,Delhi,16.05,82,1018,2.06,No Rain,OK,,construction,28.6667,77.2167
-2026-01-28 14:54:01,Delhi,16.05,82,1018,2.06,No Rain,OK,Rain,construction,28.6667,77.2167
-2026-01-28 14:54:55,Delhi,16.05,82,1018,2.06,No Rain,OK,,standard,28.6667,77.2167
-2026-01-28 14:55:11,Delhi,16.05,82,1018,2.06,No Rain,OK,,standard,28.6667,77.2167
-2026-01-28 15:43:51,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,standard,13,122
-2026-01-28 15:43:59,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,standard,13,122
-2026-01-28 15:44:12,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,standard,13,122
-2026-01-28 15:44:15,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,farmer,13,122
-2026-01-28 15:44:25,Philippines,26.37,74,1013,8.43,Rain Expected,OK,Rain,farmer,13,122
-2026-01-28 15:44:28,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,farmer,13,122
-2026-01-28 15:44:38,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,construction,13,122
-2026-01-28 15:44:42,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,farmer,13,122
-2026-01-28 15:44:45,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,construction,13,122
-2026-01-28 15:44:56,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,construction,13,122
-2026-01-28 15:45:20,Philippines,26.37,74,1013,8.43,Rain Expected,OK,,construction,13,122
+2026-02-02 13:21:26,Delhi,16.05,77,1018,3.09,No Rain,OK,,standard,28.6667,77.2167

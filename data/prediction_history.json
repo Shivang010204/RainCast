@@ -1,0 +1,16 @@
+[
+    {
+        "Time":"2026-02-02 13:21:26",
+        "City":"Delhi",
+        "Temp":16.05,
+        "Hum":77,
+        "Press":1018,
+        "Wind":3.09,
+        "ML":"No Rain",
+        "API":"OK",
+        "Report":null,
+        "Mode":"standard",
+        "Lat":28.6667,
+        "Lon":77.2167
+    }
+]
