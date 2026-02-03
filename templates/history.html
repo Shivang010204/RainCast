@@ -1,32 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>RainCast | History Logs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RainCast AI | Operational History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .mode-tag { background: #334155; padding: 4px 10px; border-radius: 5px; font-size: 0.8rem; text-transform: capitalize; }
+        body { padding: 40px; font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; }
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        .history-table th { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 15px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .history-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+        .mode-tag { background: rgba(51, 65, 85, 0.5); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
+        .proof-thumb { width: 60px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.5); cursor: pointer; transition: transform 0.2s; }
+        .proof-thumb:hover { transform: scale(1.1); }
+        .status-pill { font-weight: 600; font-size: 0.85rem; }
+        .rain-text { color: #3b82f6; } /* Blue for AI Prediction */
+        .report-confirmed { color: #ef4444; } /* Red for User Reported Rain */
+        .report-clear { color: #10b981; } /* Green for User Reported Clear */
     </style>
 </head>
-<body style="padding: 40px;">
-    <div class="glass-card" style="max-width: 1000px; margin: auto;">
-        <a href="/" class="history-btn">← Back to Dashboard</a>
-        <h1 style="text-align: center;">System Logs</h1>
-        <table>
+<body>
+    <div class="glass-card" style="max-width: 1100px; margin: auto; backdrop-filter: blur(20px);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <a href="/" class="btn-ui-secondary" style="text-decoration: none; font-size: 0.9rem;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <h1 style="margin: 0; font-weight: 600; font-size: 1.5rem;">System Operational Logs</h1>
+            <div style="width: 150px;"></div> </div>
+
+        <table class="history-table">
             <thead>
                 <tr>
-                    <th>Time</th><th>City</th><th>Prediction</th><th>Mode</th><th>User Report</th>
+                    <th>Timestamp</th>
+                    <th>City</th>
+                    <th>AI Prediction</th>
+                    <th>Sector Mode</th>
+                    <th>Visual Proof</th>
+                    <th>User Report</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in records %}
                 <tr>
-                    <td>{{ row[0] }}</td>
-                    <td><b>{{ row[1] }}</b></td>
-                    <td style="color: #3b82f6;">{{ row[6] }}</td>
+                    <td style="color: #64748b; font-size: 0.85rem;">{{ row[0] }}</td>
+                    <td><b style="font-size: 1rem;">{{ row[1] }}</b></td>
+                    <td class="status-pill rain-text">{{ row[6] }}</td>
                     <td><span class="mode-tag">{{ row[9] }}</span></td>
-                    <td>{{ row[8] or 'No Report' }}</td>
+                    
+                    <td>
+                        {% if row[12] %}
+                        <a href="{{ url_for('static', filename='uploads/' + row[12]) }}" target="_blank" style="text-decoration: none;">
+                            <img src="{{ url_for('static', filename='uploads/' + row[12]) }}" class="proof-thumb" title="Click to view full image">
+                            <div style="font-size: 0.6rem; color: #3b82f6; margin-top: 5px;">View Proof</div>
+                        </a>
+                        {% else %}
+                        <span style="color: #475569; font-size: 0.75rem;">No Image</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="status-pill {% if row[8] == 'Rain' %}report-confirmed{% elif row[8] == 'No Rain' %}report-clear{% endif %}">
+                        <i class="fa-solid {% if row[8] == 'Rain' %}fa-cloud-showers-heavy{% elif row[8] == 'No Rain' %}fa-sun{% else %}fa-circle-question{% endif %}" style="margin-right: 5px;"></i>
+                        {{ row[8] or 'Pending' }}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

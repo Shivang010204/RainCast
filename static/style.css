@@ -140,3 +140,68 @@ h1 { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
 .clear-link-ui:hover { background: var(--danger); color: white !important; }
 
 #map { height: 350px; border-radius: 18px; border: 1px solid var(--border); }
+
+/* --- HISTORY PAGE & GLASSMORPHISM UPDATES --- */
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+}
+
+.history-table th {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.btn-ui-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-ui-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.proof-thumb {
+    width: 60px; 
+    height: 45px; 
+    object-fit: cover; 
+    border-radius: 6px; 
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    transition: transform 0.2s;
+}
+
+.proof-thumb:hover {
+    transform: scale(1.1);
+    border-color: #3b82f6;
+}
