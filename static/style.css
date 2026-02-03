@@ -1,62 +1,142 @@
-:root { --bg: #0f172a; --card: rgba(255, 255, 255, 0.05); --primary: #3b82f6; }
+/* --- Global Reset & Professional Font --- */
+:root { 
+    --bg: #0f172a; 
+    --card: rgba(30, 41, 59, 0.7); 
+    --primary: #3b82f6; 
+    --primary-hover: #2563eb;
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+    --danger: #ef4444;
+    --success: #10b981;
+    --border: rgba(255, 255, 255, 0.1);
+}
 
-body { background: var(--bg); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; }
+* { box-sizing: border-box; }
 
-.main-wrapper { display: flex; min-height: 100vh; padding: 20px; gap: 20px; }
+body { 
+    background: var(--bg); 
+    color: var(--text-main); 
+    font-family: 'Inter', -apple-system, sans-serif; 
+    margin: 0; 
+    line-height: 1.6; 
+    -webkit-font-smoothing: antialiased;
+}
 
-.sidebar { width: 260px; background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+.main-wrapper { display: flex; min-height: 100vh; padding: 25px; gap: 25px; }
 
-.mode-btn { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: white; cursor: pointer; text-align: left; transition: 0.3s; }
-.mode-btn.active { background: var(--primary); border: none; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5); }
+/* --- Sidebar: High-End Navigation --- */
+.sidebar { 
+    width: 280px; 
+    background: var(--card); 
+    padding: 30px; 
+    border-radius: 24px; 
+    border: 1px solid var(--border); 
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(20px);
+}
 
+.sidebar-logo { 
+    font-size: 1.4rem; 
+    font-weight: 800; 
+    color: var(--primary);
+    margin-bottom: 40px;
+    letter-spacing: -0.5px;
+}
+
+.sidebar-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 15px;
+}
+
+.mode-btn { 
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; padding: 14px; margin-bottom: 10px; 
+    border-radius: 12px; border: none; background: transparent; 
+    color: var(--text-dim); text-decoration: none !important; font-size: 0.95rem; 
+    font-weight: 500; transition: 0.2s; 
+}
+
+.mode-btn:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+.mode-btn.active { background: var(--primary); color: white !important; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); }
+
+/* --- Dashboard Header --- */
 .dashboard { flex: 1; }
-.search-box { display: flex; gap: 10px; margin-bottom: 30px; }
-.search-box input { flex: 1; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; }
-.search-box button { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+h1 { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
+.dashboard-header p { color: var(--text-dim); margin: 5px 0 30px; }
 
-.glass-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+/* --- Search Engine --- */
+.search-box-ui { display: flex; gap: 12px; margin-bottom: 30px; position: relative; }
+.search-icon { position: absolute; left: 16px; top: 18px; color: var(--text-dim); }
+.search-box-ui input { 
+    flex: 1; padding: 15px 15px 15px 45px; border-radius: 14px; 
+    background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border); 
+    color: white; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
+}
+.search-box-ui button { 
+    background: var(--primary); color: white; border: none; 
+    padding: 0 25px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+.search-box-ui button:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
-#map { height: 280px; border-radius: 15px; margin-top: 15px; border: 2px solid rgba(255,255,255,0.1); }
+/* --- Cards & Grid --- */
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; }
+.glass-card { 
+    background: var(--card); padding: 30px; border-radius: 24px; 
+    border: 1px solid var(--border); backdrop-filter: blur(12px); 
+}
 
-.community-alert { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 15px; border-radius: 12px; margin-bottom: 25px; animation: flash 2s infinite; }
-@keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+/* --- Advice Section --- */
+.advice-module { margin: 20px 0; }
+.sector-label { font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 15px; }
+.advice-grid { display: grid; gap: 15px; }
+.advice-panel { background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+.advice-panel h6 { margin: 0 0 5px; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; color: var(--text-dim); }
+.advice-panel p { margin: 0; font-size: 0.95rem; color: var(--text-main); line-height: 1.5; }
 
-.tips-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-top: 15px; }
+/* --- ACTION BUTTONS (Detailed View & Forecast) --- */
+.primary-actions-ui { display: flex; gap: 12px; margin: 25px 0; }
+.btn-ui-main, .btn-ui-secondary { 
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px; border-radius: 12px; font-weight: 700; text-decoration: none !important; 
+    font-size: 0.85rem; transition: 0.3s;
+}
+.btn-ui-main { background: var(--primary); color: white !important; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+.btn-ui-secondary { background: rgba(255, 255, 255, 0.05); color: white !important; border: 1px solid var(--border); }
+.btn-ui-main:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+.btn-ui-secondary:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
 
-.report-btns button { padding: 10px 15px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; margin-right: 8px; }
-.btn-rain { background: #3b82f6; color: white; }
-.btn-clear { background: #10b981; color: white; }
-.history-btn { color: #3b82f6; text-decoration: none; font-weight: bold; }
-
-/* Ensure the <a> tags in the sidebar look like the original buttons */
-.mode-btn {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    text-align: center;
-    text-decoration: none; /* Removes the underline */
-    font-size: 0.9rem;
+/* --- Verification UI --- */
+.verification-module { border-top: 1px solid var(--border); padding-top: 25px; margin-top: 25px; }
+.module-label { font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; display: block; }
+.file-drop-ui label { 
+    display: block; padding: 15px; border: 2px dashed var(--border); 
+    border-radius: 12px; text-align: center; cursor: pointer; color: var(--text-dim); 
     transition: 0.3s;
-    cursor: pointer;
 }
+.file-drop-ui label:hover { border-color: var(--primary); color: white; background: rgba(59, 130, 246, 0.05); }
+.file-drop-ui input { display: none; }
 
-.mode-btn:hover {
-    background: rgba(59, 130, 246, 0.2);
-}
+.report-controls-ui { display: flex; gap: 12px; margin-top: 15px; }
+.btn-report { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; color: white; text-transform: uppercase; font-size: 0.75rem; transition: 0.3s; }
+.rain-btn { background: var(--danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+.clear-btn { background: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+.btn-report:hover { filter: brightness(1.2); transform: translateY(-2px); }
 
-.mode-btn.active {
-    background: #3b82f6;
-    font-weight: 600;
+/* --- Sidebar Footer & Reset Links --- */
+.sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; }
+.history-btn-ui, .clear-link-ui {
+    display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; 
+    text-decoration: none !important; font-size: 0.85rem; font-weight: 600; transition: 0.2s;
 }
+.history-btn-ui { color: var(--primary) !important; background: rgba(59, 130, 246, 0.1); margin-bottom: 8px; }
+.history-btn-ui:hover { background: var(--primary); color: white !important; }
 
-/* Optional: Add the "Rain Glow" effect we added to the dashboard */
-.rain-glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-    border: 1px solid rgba(59, 130, 246, 0.5) !important;
-}
+.clear-link-ui { color: var(--danger) !important; background: rgba(239, 68, 68, 0.1); }
+.clear-link-ui:hover { background: var(--danger); color: white !important; }
+
+#map { height: 350px; border-radius: 18px; border: 1px solid var(--border); }

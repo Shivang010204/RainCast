@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RainCast AI | 5-Day Forecast</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="main-wrapper">
+    <aside class="sidebar">
+        <div class="sidebar-logo">🌧 RainCast</div>
+        <nav>
+            <a href="/" class="mode-btn">🏠 Back to Dashboard</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard">
+        <h1>5-Day AI Forecast: <span style="color: #3b82f6;">{{ city }}</span></h1>
+        <p>Our ML model has analyzed the upcoming weather parameters to predict rain trends.</p>
+
+        <div class="forecast-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px;">
+            {% for day in predictions %}
+            <div class="glass-card" style="text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">{{ day.date }}</h3>
+                <div style="font-size: 2.5rem; margin: 15px 0;">
+                    {% if "Rain" in day.status %}🌧{% else %}☀️{% endif %}
+                </div>
+                <h2 style="margin-bottom: 5px;">{{ day.temp }}°C</h2>
+                <p style="font-weight: 600; color: {% if 'Rain' in day.status %}#60a5fa{% else %}#fbbf24{% endif %};">
+                    {{ day.status }}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="glass-card" style="margin-top: 30px;">
+            <h3>💡 Prediction Logic</h3>
+            <p>The system fetches future atmospheric data (Temperature, Humidity, Pressure) from the Meteorological API and passes each 24-hour block through the <b>RainCast ML Classifier</b> to generate these results.</p>
+        </div>
+    </main>
+</div>
+</body>
+</html>
