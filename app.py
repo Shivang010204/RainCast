@@ -5,8 +5,11 @@ import csv
 import os
 import json
 import pandas as pd
+import time
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
+from PIL import Image
+from PIL.ExifTags import TAGS
 
 app = Flask(__name__)
 app.secret_key = "raincast_secure_key_123" 
@@ -19,32 +22,52 @@ MODEL_PATH = "model/raincast_model.pkl"
 HISTORY_FILE = "data/prediction_history.csv"
 JSON_HISTORY_FILE = "data/prediction_history.json" 
 UPLOAD_FOLDER = 'static/uploads'
+ADMIN_PASSWORD = "shivang" # Change this for your demo
 
-# Ensure directories exist
 os.makedirs('model', exist_ok=True)
 os.makedirs('data', exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Load ML Model
 try:
     model = joblib.load(MODEL_PATH)
 except:
-    print("Warning: Model file not found. Ensure raincast_model.pkl exists in model/ folder.")
+    print("Warning: Model file not found.")
 
 # ================= HELPER FUNCTIONS =================
 
+def get_image_metadata(image_path):
+    """ Extracts EXIF data to verify photo authenticity """
+    try:
+        with Image.open(image_path) as img:
+            exif_data = img._getexif()
+            if not exif_data:
+                return None, False
+
+            photo_time = None
+            has_gps = False
+            for tag, value in exif_data.items():
+                decoded = TAGS.get(tag, tag)
+                if decoded in ['DateTimeDigitized', 'DateTime']:
+                    photo_time = value
+                if decoded == 'GPSInfo':
+                    has_gps = True
+            return photo_time, has_gps
+    except Exception as e:
+        print(f"Metadata Error: {e}")
+        return None, False
+
 def sync_to_json():
-    """Converts the CSV history to JSON format for web compatibility."""
     try:
         if os.path.exists(HISTORY_FILE):
             df = pd.read_csv(HISTORY_FILE)
             df.to_json(JSON_HISTORY_FILE, orient='records', indent=4)
     except Exception as e:
         print(f"Sync Error: {e}")
-
+        
+        
 def generate_advice(temp, hum, wind, prediction, mode):
-    """Generates professional sector-specific protocols."""
+    """Generates professional sector-specific protocols based on ML and Weather data."""
     advice = {
         "clothing": "Standard professional attire.",
         "activity": "Operational tasks normal.",
@@ -84,12 +107,10 @@ def index():
     prediction, weather, error, community_report, advice = [None]*5
     records = []
 
-    # Read records for community alerts
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             records = list(csv.reader(f))
 
-    # Determine City and Mode from multiple sources
     current_mode = request.form.get("user_mode") or request.args.get("user_mode") or session.get('last_mode', 'standard')
     city = request.form.get("city") or request.args.get("city") or session.get('last_city')
 
@@ -106,38 +127,24 @@ def index():
                 error = "Operational Target: City not found."
                 session.pop('last_city', None)
             else:
-                # Weather Data Extraction
                 temp, hum, press, wind = res["main"]["temp"], res["main"]["humidity"], res["main"]["pressure"], res["wind"]["speed"]
                 lon, lat = res["coord"]["lon"], res["coord"]["lat"]
                 
-                # ML Inference Logic
                 result = model.predict([[temp, hum, press, wind]])[0]
                 prediction = "Rain Expected" if result == 1 else "No Rain"
                 
                 weather = {"city": city, "temp": temp, "hum": hum, "wind": wind, "lon": lon, "lat": lat}
                 advice = generate_advice(temp, hum, wind, prediction, current_mode)
 
-                # Check for Community Reports within last 60 mins
-                for row in reversed(records):
-                    if len(row) > 8 and row[1].lower() == city.lower() and row[8] != "":
-                        try:
-                            report_time = datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S")
-                            if datetime.now() - report_time < timedelta(minutes=60):
-                                community_report = row[8]
-                                break
-                        except: continue
-                
-                # Log search to History CSV
+                # Log search with empty columns for report and proof
                 file_exists = os.path.isfile(HISTORY_FILE)
                 with open(HISTORY_FILE, "a", newline="", encoding="utf-8") as f:
                     writer = csv.writer(f)
                     if not file_exists:
-                        writer.writerow(["Time", "City", "Temp", "Hum", "Press", "Wind", "ML", "API", "Report", "Mode", "Lat", "Lon", "Proof"])
-                    writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), city, temp, hum, press, wind, prediction, "OK", "", current_mode, lat, lon, ""])
+                        writer.writerow(["Time", "City", "Temp", "Hum", "Press", "Wind", "ML", "API", "Report", "Mode", "Lat", "Lon", "Proof", "Genuine_Status"])
+                    writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), city, temp, hum, press, wind, prediction, "OK", "", current_mode, lat, lon, "", "Pending"])
                 
                 sync_to_json() 
-                
-                # Refresh records for the map UI
                 with open(HISTORY_FILE, "r", encoding="utf-8") as f:
                     records = list(csv.reader(f))
 
@@ -153,62 +160,88 @@ def save_report():
     city = request.form.get('city')
     status = request.form.get('status')
     lat, lon = request.form.get('lat', ""), request.form.get('lon', "")
-    
     file = request.files.get('proof_img')
-    img_filename = ""
     
+    img_filename = ""
+    trust_status = "No Photo"
+
     if file and file.filename != '':
-        ts = datetime.now().strftime("%H%M%S")
+        ts = int(time.time())
         img_filename = secure_filename(f"{city}_{ts}_{file.filename}")
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], img_filename))
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], img_filename)
+        file.save(filepath)
+
+        # OPTION 1: METADATA CHECK
+        photo_time, has_gps = get_image_metadata(filepath)
+        
+        if photo_time:
+            try:
+                # EXIF dates use colons (2026:02:09)
+                taken_at = datetime.strptime(photo_time[:10], '%Y:%m:%d')
+                if taken_at.date() == datetime.now().date():
+                    trust_status = "Genuine"
+                else:
+                    trust_status = "Old Photo"
+            except:
+                trust_status = "Metadata Error"
+        else:
+            trust_status = "Flagged (No Metadata)"
     
     try:
         if os.path.exists(HISTORY_FILE):
             with open(HISTORY_FILE, "r", encoding="utf-8") as f:
                 records = list(csv.reader(f))
             
-            # Find the last empty report for this city and update it
             for i in range(len(records)-1, 0, -1):
                 if records[i][1].lower() == city.lower() and records[i][8] == "":
-                    while len(records[i]) < 13: records[i].append("")
+                    while len(records[i]) < 14: records[i].append("")
                     records[i][8] = status
                     records[i][10] = lat
                     records[i][11] = lon
                     records[i][12] = img_filename
+                    records[i][13] = trust_status # Genuine check
                     break
             
             with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
                 csv.writer(f).writerows(records)
-            
             sync_to_json()
-        flash(f"Verified {status} report for {city} synchronized successfully.")
+        flash(f"Report Verified as: {trust_status}")
     except:
         flash("Error saving verification data.")
 
     return redirect(url_for("index", city=city))
 
-@app.route("/forecast")
-def get_forecast():
-    city = session.get('last_city')
-    if not city: return redirect(url_for('index'))
+# ================= ADMIN PANEL LOGIC =================
 
-    res = requests.get(FORECAST_URL, params={"q": city, "appid": API_KEY, "units": "metric"}).json()
+@app.route("/admin_login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        if request.form.get("password") == ADMIN_PASSWORD:
+            session['is_admin'] = True
+            return redirect(url_for('admin_panel'))
+        flash("Incorrect Password")
+    return render_template("admin_login.html")
+
+@app.route("/admin_panel")
+def admin_panel():
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
     
-    predictions = []
-    if res.get("cod") == "200":
-        for item in res['list'][::8]: # Take one reading per day
-            temp, hum, press, wind = item['main']['temp'], item['main']['humidity'], item['main']['pressure'], item['wind']['speed']
-            
-            result = model.predict([[temp, hum, press, wind]])[0]
-            status = "Rain Expected" if result == 1 else "Clear Skies"
-            
-            predictions.append({
-                "date": item['dt_txt'].split(" ")[0], 
-                "temp": temp, 
-                "status": status
-            })
-    
-    return render_template("forecast.html", city=city, predictions=predictions)
+    records = []
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            records = list(csv.reader(f))
+            if len(records) > 0:
+                records.pop(0)  # Remove CSV header
+                
+    # FIX: Wrap reversed(records) in list() 
+    # This turns it back into a list that has a length!
+    return render_template("admin_panel.html", records=list(reversed(records)))
+
+@app.route("/admin_logout")
+def admin_logout():
+    session.pop('is_admin', None)
+    return redirect(url_for('index'))
 
 @app.route("/standard")
 def standard_portal():
@@ -230,21 +263,54 @@ def standard_portal():
     
     return render_template("standard.html", city=city, temp=temp, hum=hum, feels_like=feels_like)
 
-@app.route("/history")
-def history():
-    records = []
-    if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, newline="", encoding="utf-8") as f:
-            reader = csv.reader(f)
-            next(reader) # skip header
-            records = list(reader)
-    return render_template("history.html", records=reversed(records))
+@app.route("/delete_record/<int:index>")
+def delete_record(index):
+    # 1. Security Check: Only admins can delete
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
+    
+    try:
+        # 2. Read all existing records
+        records = []
+        if os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                records = list(csv.reader(f))
+            
+            # Since admin_panel shows records in REVERSED order, 
+            # we need to calculate the actual row index in the original file.
+            # Header is at 0, data starts at 1.
+            # Formula: (Total Length - 1) - index_from_ui
+            header = records[0]
+            data_rows = records[1:]
+            
+            # Remove the correct row from data_rows
+            if 0 <= index < len(data_rows):
+                # Reverse the index back to match original list
+                actual_idx = (len(data_rows) - 1) - index
+                
+                # Optional: Delete physical image file
+                img_file = data_rows[actual_idx][12]
+                if img_file:
+                    try:
+                        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], img_file))
+                    except: pass
+                
+                del data_rows[actual_idx]
+                
+                # 3. Write back to CSV (Header + remaining Data)
+                with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(header)
+                    writer.writerows(data_rows)
+                
+                flash("Record successfully purged from system.")
 
-@app.route("/clear")
-def clear_search():
-    session.pop('last_city', None)
-    flash("Session cache cleared.")
-    return redirect(url_for('index'))
+    except Exception as e:
+        flash(f"System Error: {str(e)}")
+        
+    return redirect(url_for('admin_panel'))
+
+# (Keep your other routes: history, forecast, clear, generate_advice)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RainCast | Admin Control</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="padding: 40px; background-color: #0f172a;"> <div class="glass-card" style="max-width: 1200px; margin: auto; min-height: 400px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
+            <div>
+                <h1 style="margin: 0; color: white;">Operational Control Center</h1>
+                <p style="color: #94a3b8; margin: 5px 0 0 0;">
+                    Managing {{ records|count if records else 0 }} total system entries
+                </p>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <a href="/" class="btn-ui-secondary" style="border-color: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 10px; border-radius: 8px; border: 1px solid;">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+                <a href="/admin_logout" class="btn-ui-secondary" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); text-decoration: none; padding: 10px; border-radius: 8px; border: 1px solid;">
+                    <i class="fa-solid fa-power-off"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        {% if records and records|length > 0 %}
+        <table class="history-table" style="width: 100%; color: white; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                    <th>Timestamp</th>
+                    <th>City</th>
+                    <th>Report</th>
+                    <th>Proof</th>
+                    <th>Authenticity</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in records %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 15px 5px; font-size: 0.8rem; color: #64748b;">{{ row[0] }}</td>
+                    <td><b>{{ row[1] }}</b></td>
+                    <td>{{ row[8] if row[8] else 'Search Only' }}</td>
+                    <td>
+                        {% if row[12] %}
+                        <img src="/static/uploads/{{ row[12] }}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1);">
+                        {% else %}
+                        <span style="opacity: 0.3;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if row[13] == 'Genuine' %}
+                            <b style="color: #10b981;">Verified</b>
+                        {% elif row[13] == 'Old Photo' %}
+                            <b style="color: #f59e0b;">Outdated</b>
+                        {% else %}
+                            <b style="color: #ef4444;">Suspicious</b>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="javascript:void(0);" onclick="confirmDelete('{{ loop.index0 }}')" style="color: #ef4444;">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="text-align: center; padding: 100px; color: #64748b;">
+            <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 20px;"></i>
+            <p>No historical records found in system storage.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+    function confirmDelete(idx) {
+        if(confirm("Permanently remove this record and associated image?")) {
+            window.location.href = "/delete_record/" + idx;
+        }
+    }
+    </script>
+</body>
+</html>

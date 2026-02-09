@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2.2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2.3">
 </head>
 <body>
 <div class="main-wrapper">
@@ -117,6 +117,9 @@
 
                 <div class="verification-module">
                     <span class="module-label">Data Integrity Verification</span>
+                    <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 10px;">
+                        Upload a fresh photo to verify current conditions. Metadata will be checked for authenticity.
+                    </p>
                     <form action="/report" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="city" value="{{ weather.city }}">
                         <input type="hidden" name="lat" value="{{ weather.lat }}">
@@ -160,14 +163,27 @@
             .bindPopup("<b>Target Area:</b> {{ weather.city }}<br>Forecast: {{ prediction }}")
             .openPopup();
 
+        // Overlay Community Reports on Map
         {% for row in records %}
             {% if row[8] == 'Rain' and row|length > 11 and row[10] != "" %}
+                // Use different colors based on row[13] (Genuine Status)
+                var markerColor = '{{ "#10b981" if row[13] == "Genuine" else "#ef4444" }}';
                 L.circle([{{ row[10] }}, {{ row[11] }}], {
-                    color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.2, radius: 1000
-                }).addTo(map).bindPopup("Verified Precipitation Event");
+                    color: markerColor, 
+                    fillColor: markerColor, 
+                    fillOpacity: 0.2, 
+                    radius: 1200
+                }).addTo(map).bindPopup("<b>User Report:</b> Rain Detected<br>Status: {{ row[13] }}");
             {% endif %}
         {% endfor %}
     {% endif %}
 </script>
+
+<footer style="margin-top: 50px; padding: 20px; text-align: center; opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.05);">
+    <p>&copy; 2026 RainCast AI | Developed for MCA Final Evaluation</p>
+    <a href="{{ url_for('admin_login') }}" style="color: #64748b; text-decoration: none; font-size: 0.75rem; transition: 0.3s;">
+        <i class="fa-solid fa-lock"></i> Operational Staff Access
+    </a>
+</footer>
 </body>
 </html>
