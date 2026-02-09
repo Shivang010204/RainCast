@@ -6,6 +6,7 @@ import os
 import json
 import pandas as pd
 import time
+import shutil
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -307,6 +308,37 @@ def delete_record(index):
 
     except Exception as e:
         flash(f"System Error: {str(e)}")
+        
+    return redirect(url_for('admin_panel'))
+
+@app.route("/clear_all_data")
+def clear_all_data():
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
+    
+    try:
+        # 1. Reset the CSV File
+        header = ["timestamp", "city", "temp", "hum", "wind", "desc", "prediction", "mode", "status", "advice", "lat", "lon", "image", "authenticity"]
+        with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+        
+        # 2. Clear the Uploads Folder
+        if os.path.exists(app.config['UPLOAD_FOLDER']):
+            for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+        
+        # 3. Clear JSON cache if you have one
+        sync_to_json() 
+        
+        flash("System Reset Successful: All records and images purged.")
+    except Exception as e:
+        flash(f"Purge Failed: {str(e)}")
         
     return redirect(url_for('admin_panel'))
 
