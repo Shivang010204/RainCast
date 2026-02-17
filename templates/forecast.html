@@ -4,40 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RainCast AI | 5-Day Forecast</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: var(--bg); color: var(--text-main); }
+        
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* Force 5 columns for the 5 days */
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .forecast-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+        }
+
+        .forecast-card {
+            text-align: center;
+            padding: 25px 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .forecast-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .weather-icon-ai {
+            font-size: 2rem;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+        }
+    </style>
 </head>
 <body>
 <div class="main-wrapper">
     <aside class="sidebar">
-        <div class="sidebar-logo">🌧 RainCast</div>
+        <div class="sidebar-logo">RainCast AI</div>
+        
         <nav>
-            <a href="/" class="mode-btn">🏠 Back to Dashboard</a>
+            <p class="sidebar-label">Navigation</p>
+            <a href="/?city={{ city }}" class="mode-btn">
+                <i class="fa-solid fa-house-chimney"></i> Back to Hub
+            </a>
         </nav>
+
+        <div class="sidebar-footer" style="margin-top: auto;">
+            <p class="sidebar-label">Forecast Engine</p>
+            <div class="glass-card" style="padding: 10px; font-size: 0.7rem; color: var(--text-dim);">
+                <i class="fa-solid fa-microchip"></i> ML Model v3.1 Active
+            </div>
+        </div>
     </aside>
 
-    <main class="dashboard">
-        <h1>5-Day AI Forecast: <span style="color: #3b82f6;">{{ city }}</span></h1>
-        <p>Our ML model has analyzed the upcoming weather parameters to predict rain trends.</p>
+    <main class="dashboard" style="padding: 20px;">
+        <header style="margin-bottom: 40px;">
+            <div class="sidebar-logo" style="margin-bottom: 5px; font-size: 1.5rem;">5-DAY PREDICTIVE LOG</div>
+            <p class="label-tiny">Target Region: <span style="color: var(--primary);">{{ city }}</span></p>
+        </header>
 
-        <div class="forecast-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px;">
+        <div class="forecast-grid">
             {% for day in predictions %}
-            <div class="glass-card" style="text-align: center; border: 1px solid rgba(255,255,255,0.1);">
-                <h3 style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">{{ day.date }}</h3>
-                <div style="font-size: 2.5rem; margin: 15px 0;">
-                    {% if "Rain" in day.status %}🌧{% else %}☀️{% endif %}
+            <div class="glass-card forecast-card">
+                <p class="label-tiny" style="font-size: 0.6rem;">{{ day.date }}</p>
+                
+                <div class="weather-icon-ai">
+                    {% if "Rain" in day.status %}
+                        <i class="fa-solid fa-cloud-showers-heavy" style="color: var(--primary);"></i>
+                    {% else %}
+                        <i class="fa-solid fa-sun" style="color: var(--accent-amber);"></i>
+                    {% endif %}
                 </div>
-                <h2 style="margin-bottom: 5px;">{{ day.temp }}°C</h2>
-                <p style="font-weight: 600; color: {% if 'Rain' in day.status %}#60a5fa{% else %}#fbbf24{% endif %};">
+
+                <div class="data-large" style="font-size: 1.8rem; margin-bottom: 5px;">
+                    {{ day.temp }}°C
+                </div>
+
+                <p style="font-weight: 700; font-size: 0.8rem; color: {% if 'Rain' in day.status %}var(--primary){% else %}var(--accent-amber){% endif %}; text-transform: uppercase; letter-spacing: 1px;">
                     {{ day.status }}
                 </p>
             </div>
             {% endfor %}
         </div>
         
-        <div class="glass-card" style="margin-top: 30px;">
-            <h3>💡 Prediction Logic</h3>
-            <p>The system fetches future atmospheric data (Temperature, Humidity, Pressure) from the Meteorological API and passes each 24-hour block through the <b>RainCast ML Classifier</b> to generate these results.</p>
+        <div class="glass-card" style="margin-top: 30px; border-left: 3px solid var(--primary);">
+            <h3 style="margin-top: 0; font-size: 1rem;"><i class="fa-solid fa-brain"></i> Inference Intelligence</h3>
+            <p style="font-size: 0.85rem; color: var(--text-dim); line-height: 1.6;">
+                This forecast is generated by feeding future atmospheric vectors into our <b>Random Forest Classifier</b>. Unlike standard forecasts, RainCast analyzes local <b>Indian climate datasets</b> to identify precipitation patterns unique to tropical zones.
+            </p>
         </div>
     </main>
 </div>

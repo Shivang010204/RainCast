@@ -1,75 +1,81 @@
 /**
- * RainCast AI - Client Side Logic (Dashboard Edition)
+ * RainCast AI - Obsidian Pro Logic
  */
 
-// 1. Handle Sidebar Mode Selection
-function updateMode(mode, btnElement) {
-    // Update the hidden input in the form
-    const modeInput = document.getElementById('user_mode');
-    if (modeInput) {
-        modeInput.value = mode;
-    }
+// 1. Smooth Form Submission & UI Feedback
+document.querySelector('.search-box-ui')?.addEventListener('submit', function(e) {
+    const btn = this.querySelector('button');
+    // Change button to a loading state
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Executing...';
+    btn.style.opacity = "0.8";
+    btn.style.pointerEvents = "none";
+});
 
-    // Update UI: Remove 'active' class from all buttons and add to the clicked one
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    btnElement.classList.add('active');
-
-    // Optional: Visual confirmation for the user
-    console.log(`System switched to ${mode} mode.`);
-}
-
-// 2. Handle the "Report Actual Weather" feedback (AJAX)
+// 2. Handle Report Status with Professional Feedback
 async function reportWeather(status, city) {
-    const reportSection = document.querySelector(".report-btns");
-    const originalContent = reportSection.innerHTML;
+    const reportControls = document.querySelector(".report-controls-ui");
+    if (!reportControls) return;
+
+    // Preserve height to prevent layout shift
+    const originalHeight = reportControls.offsetHeight;
+    reportControls.style.minHeight = `${originalHeight}px`;
     
-    // Provide immediate visual feedback
-    reportSection.innerHTML = `<p style="color: #00f2fe; font-size: 0.85rem; width: 100%; text-align: center;">Saving your feedback...</p>`;
+    // Smooth fade out of buttons
+    reportControls.style.opacity = "0.5";
+    reportControls.style.pointerEvents = "none";
 
     try {
         const response = await fetch('/report', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
+            // Note: Since the HTML now uses a real form for file uploads, 
+            // this AJAX is for quick-clicks. 
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `status=${encodeURIComponent(status)}&city=${encodeURIComponent(city)}`
         });
 
         if (response.ok) {
-            reportSection.innerHTML = `
-                <p style="color: #4cd137; font-size: 0.85rem; width: 100%; text-align: center;">
-                    ✔ Thank you! This helps improve our ML model accuracy.
-                </p>`;
-        } else {
-            throw new Error('Server error');
+            reportControls.innerHTML = `
+                <div style="grid-column: span 2; text-align: center; animation: fadeIn 0.5s ease;">
+                    <p style="color: var(--success); font-weight: 600; margin: 0;">
+                        <i class="fa-solid fa-circle-check"></i> Analysis Verified Successfully
+                    </p>
+                </div>`;
         }
     } catch (error) {
-        reportSection.innerHTML = originalContent; // Restore buttons so they can try again
-        alert("⚠ Connection failed. Please try again.");
+        reportControls.style.opacity = "1";
+        reportControls.style.pointerEvents = "all";
+        console.error("Verification failed", error);
     }
 }
 
-// 3. Form Submission Loader
-document.getElementById('predictionForm')?.addEventListener('submit', function() {
-    const btn = this.querySelector('button');
-    btn.innerHTML = "Analyzing...";
-    btn.style.opacity = "0.7";
-    btn.disabled = true;
-});
-
-// 4. Smooth Fade-in for Cards
+// 3. Dynamic "Glass-Card" Animation Sequence
 document.addEventListener("DOMContentLoaded", () => {
     const cards = document.querySelectorAll(".glass-card");
+    
     cards.forEach((card, index) => {
+        // Initial state
         card.style.opacity = "0";
-        card.style.transform = "translateY(20px)";
-        card.style.transition = "all 0.5s ease-out";
+        card.style.transform = "translateY(30px) scale(0.98)";
+        card.style.transition = "all 0.6s cubic-bezier(0.23, 1, 0.32, 1)"; 
         
+        // Staggered reveal
         setTimeout(() => {
             card.style.opacity = "1";
-            card.style.transform = "translateY(0)";
-        }, 100 * index);
+            card.style.transform = "translateY(0) scale(1)";
+        }, 150 * index);
     });
 });
+
+// 4. Input Field "Focus" Glow Effect
+const searchInput = document.querySelector('.search-box-ui input');
+if (searchInput) {
+    searchInput.addEventListener('focus', () => {
+        document.querySelector('.search-box-ui').style.borderColor = 'var(--primary)';
+        document.querySelector('.search-box-ui').style.boxShadow = '0 0 20px rgba(99, 102, 241, 0.15)';
+    });
+    
+    searchInput.addEventListener('blur', () => {
+        document.querySelector('.search-box-ui').style.borderColor = 'var(--border)';
+        document.querySelector('.search-box-ui').style.boxShadow = 'none';
+    });
+}

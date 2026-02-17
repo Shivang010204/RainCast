@@ -2,32 +2,78 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RainCast | Admin Control</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body style="padding: 40px; background-color: #0f172a;"> 
-    <div class="glass-card" style="max-width: 1200px; margin: auto; min-height: 400px;">
+    <style>
+        body { padding: 40px; background-color: var(--bg); height: auto; overflow-y: auto; }
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
+        .admin-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px; /* Spaced rows for modular look */
+            margin-top: 20px;
+        }
+        
+        .admin-table th {
+            padding: 15px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .admin-table td {
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+            vertical-align: middle;
+        }
+
+        .admin-table tr td:first-child { border-left: 1px solid var(--card-border); border-radius: 12px 0 0 12px; }
+        .admin-table tr td:last-child { border-right: 1px solid var(--card-border); border-radius: 0 12px 12px 0; }
+
+        .admin-table tr:hover td {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--primary);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-genuine { background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald); border: 1px solid var(--accent-emerald); }
+        .badge-old { background: rgba(245, 158, 11, 0.1); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
+        .badge-fake { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card" style="max-width: 1300px; margin: auto;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--card-border);">
             <div>
-                <h1 style="margin: 0; color: white;">Operational Control Center</h1>
-                <p style="color: #94a3b8; margin: 5px 0 0 0;">
-                    Managing {{ records|count if records else 0 }} total system entries
-                </p>
+                <div class="sidebar-logo" style="margin-bottom: 0;">Operational Control</div>
+                <p class="label-tiny">System Log: {{ records|count if records else 0 }} Active Entries</p>
             </div>
             
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <button onclick="clearAllData()" class="btn-ui-secondary" style="color: #f87171; border-color: rgba(248, 113, 113, 0.3); background: rgba(239, 68, 68, 0.1); cursor: pointer; padding: 10px 15px; border-radius: 8px; border: 1px solid;">
-                    <i class="fa-solid fa-fire-extinguisher"></i> Purge All
+            <div style="display: flex; gap: 12px;">
+                <button onclick="clearAllData()" class="mode-btn" style="border-color: var(--danger); color: var(--danger); font-size: 0.8rem;">
+                    <i class="fa-solid fa-fire-extinguisher"></i> Purge All Records
                 </button>
 
-                <a href="/" class="btn-ui-secondary" style="border-color: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 10px 15px; border-radius: 8px; border: 1px solid;">
-                    <i class="fa-solid fa-house"></i> Dashboard
+                <a href="/" class="mode-btn" style="text-decoration:none; display: flex; align-items: center;">
+                    <i class="fa-solid fa-house"></i>
                 </a>
                 
-                <a href="/admin_logout" class="btn-ui-secondary" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); text-decoration: none; padding: 10px 15px; border-radius: 8px; border: 1px solid;">
-                    <i class="fa-solid fa-power-off"></i> Logout
+                <a href="/admin_logout" class="mode-btn" style="color: var(--danger); text-decoration:none; display: flex; align-items: center;">
+                    <i class="fa-solid fa-power-off"></i>
                 </a>
             </div>
         </div>
@@ -35,49 +81,53 @@
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             {% for message in messages %}
-              <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.2); font-size: 0.9rem;">
-                  <i class="fa-solid fa-circle-check"></i> {{ message }}
+              <div style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--primary); font-size: 0.85rem;">
+                  <i class="fa-solid fa-circle-info"></i> {{ message }}
               </div>
             {% endfor %}
           {% endif %}
         {% endwith %}
 
         {% if records and records|length > 0 %}
-        <table class="history-table" style="width: 100%; color: white; text-align: left;">
+        <table class="admin-table">
             <thead>
-                <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
-                    <th>Timestamp</th>
-                    <th>City</th>
-                    <th>Report</th>
-                    <th>Proof</th>
-                    <th>Authenticity</th>
-                    <th>Action</th>
+                <tr>
+                    <th>Entry Timestamp</th>
+                    <th>Target City</th>
+                    <th>Prediction</th>
+                    <th>Visual Proof</th>
+                    <th>Status</th>
+                    <th>Terminal</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in records %}
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <td style="padding: 15px 5px; font-size: 0.8rem; color: #64748b;">{{ row[0] }}</td>
-                    <td><b>{{ row[1] }}</b></td>
-                    <td>{{ row[8] if row[8] else 'Search Only' }}</td>
+                <tr>
+                    <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-dim);">{{ row[0] }}</td>
+                    <td><b style="color: var(--text-main);">{{ row[1] }}</b></td>
+                    <td>
+                        <span class="{{ 'emerald-glow' if row[8] == 'No Rain' else 'amber-glow' }}" style="font-weight: 700; font-size: 0.85rem;">
+                            {{ row[8] if row[8] else 'NULL_QUERY' }}
+                        </span>
+                    </td>
                     <td>
                         {% if row[12] %}
-                        <img src="/static/uploads/{{ row[12] }}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1);">
+                        <img src="/static/uploads/{{ row[12] }}" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px; border: 1px solid var(--card-border); cursor: pointer;" onclick="window.open(this.src)">
                         {% else %}
-                        <span style="opacity: 0.3;">-</span>
+                        <span style="color: #333; font-size: 0.7rem;">NO_DATA</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if row[13] == 'Genuine' %}
-                            <b style="color: #10b981;">Verified</b>
+                            <span class="badge badge-genuine">Verified</span>
                         {% elif row[13] == 'Old Photo' %}
-                            <b style="color: #f59e0b;">Outdated</b>
+                            <span class="badge badge-old">Outdated</span>
                         {% else %}
-                            <b style="color: #ef4444;">Suspicious</b>
+                            <span class="badge badge-fake">Flagged</span>
                         {% endif %}
                     </td>
                     <td>
-                        <a href="javascript:void(0);" onclick="confirmDelete('{{ loop.index0 }}')" style="color: #ef4444; font-size: 1.1rem;">
+                        <a href="javascript:void(0);" onclick="confirmDelete('{{ loop.index0 }}')" style="color: var(--danger); opacity: 0.6; transition: 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">
                             <i class="fa-solid fa-trash-can"></i>
                         </a>
                     </td>
@@ -86,27 +136,23 @@
             </tbody>
         </table>
         {% else %}
-        <div style="text-align: center; padding: 100px; color: #64748b;">
-            <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 20px;"></i>
-            <p>No historical records found in system storage.</p>
+        <div style="text-align: center; padding: 100px; border: 1px dashed var(--card-border); border-radius: 20px;">
+            <i class="fa-solid fa-database" style="font-size: 2rem; color: #222; margin-bottom: 15px;"></i>
+            <p style="color: var(--text-dim);">Storage cluster empty. No records found.</p>
         </div>
         {% endif %}
     </div>
 
     <script>
-    // Single record deletion
     function confirmDelete(idx) {
-        if(confirm("Permanently remove this specific record and its proof image?")) {
+        if(confirm("DESTRUCTION WARNING: Remove record ID [" + idx + "]?")) {
             window.location.href = "/delete_record/" + idx;
         }
     }
 
-    // NEW: System-wide purge
     function clearAllData() {
-        if (confirm("CRITICAL WARNING: This will permanently delete EVERY record and image from the system history. Do you want to proceed?")) {
-            if (confirm("FINAL CONFIRMATION: Are you absolutely sure? This cannot be undone.")) {
-                window.location.href = "/clear_all_data";
-            }
+        if (confirm("CRITICAL: Purge entire system database? This action is IRREVERSIBLE.")) {
+            window.location.href = "/clear_all_data";
         }
     }
     </script>

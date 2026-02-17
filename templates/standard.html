@@ -2,35 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Life | RainCast AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: var(--bg); color: var(--text-main); padding: 25px; }
+        
+        .lifestyle-icon {
+            font-size: 1.2rem;
+            width: 35px;
+            color: var(--primary);
+        }
+        
+        .tip-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .tip-row:last-child { border-bottom: none; margin-bottom: 0; }
+    </style>
 </head>
 <body>
-    <div class="dashboard" style="margin-left: 0; padding: 40px;">
-        <a href="/?city={{ city }}" style="color: #3b82f6; text-decoration: none;">← Back to Dashboard</a>
-        <h1>🏠 Daily Lifestyle Insights</h1>
-        <p>City: <b>{{ city }}</b></p>
+    <div class="dashboard" style="max-width: 1000px; margin: auto;">
+        <a href="/?city={{ city }}" class="staff-portal-link" style="display: inline-block; margin-bottom: 20px;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Hub
+        </a>
 
-        <div class="dashboard-grid">
-            <div class="glass-card" style="text-align: center;">
-                <h3>RealFeel™ Index</h3>
-                <h1 style="font-size: 3rem;">32°C</h1>
-                <p>It feels warmer than the actual temp due to 65% humidity.</p>
+        <header style="margin-bottom: 30px;">
+            <div class="sidebar-logo" style="margin-bottom: 5px;">LIFESTYLE INSIGHTS</div>
+            <p class="label-tiny">Personalized Forecast for <span style="color: var(--text-main);">{{ city }}</span></p>
+        </header>
+
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px;">
+            
+            <div class="glass-card" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                <p class="label-tiny">Heat Index</p>
+                <h3 style="margin: 10px 0;">RealFeel™</h3>
+                <div class="data-large amber-glow" style="font-size: 4rem; margin: 10px 0;">32°C</div>
+                <p style="font-size: 0.85rem; color: var(--text-dim);">
+                    High humidity (65%) detected. It will feel significantly warmer than the ambient temperature.
+                </p>
             </div>
 
             <div class="glass-card">
-                <h3>Commute & Traffic</h3>
-                <p>🚗 <b>Traffic:</b> Expect 15-min delays in low-lying areas.</p>
-                <p>🚲 <b>Two-Wheelers:</b> Carry rain gear; roads may be slippery.</p>
-                <p>🏃 <b>Outdoor Sports:</b> Not recommended after 4:00 PM.</p>
+                <p class="label-tiny" style="color: var(--primary);">Transit & Mobility</p>
+                <h3 style="margin: 10px 0;"><i class="fa-solid fa-car-side"></i> Daily Commute</h3>
+                
+                <div class="tip-row">
+                    <i class="fa-solid fa-traffic-light lifestyle-icon"></i>
+                    <div>
+                        <b style="display: block; font-size: 0.9rem;">Traffic Delays</b>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">Expect 15-min delays in low-lying corridors due to potential waterlogging.</span>
+                    </div>
+                </div>
+
+                <div class="tip-row">
+                    <i class="fa-solid fa-motorcycle lifestyle-icon"></i>
+                    <div>
+                        <b style="display: block; font-size: 0.9rem;">Two-Wheeler Safety</b>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">Slippery road warning. Ensure rain gear is accessible.</span>
+                    </div>
+                </div>
+
+                <div class="tip-row">
+                    <i class="fa-solid fa-person-running lifestyle-icon"></i>
+                    <div>
+                        <b style="display: block; font-size: 0.9rem;">Outdoor Activity</b>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">Outdoor sessions not recommended after 16:00 IST.</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="glass-card" style="margin-top: 20px;">
-            <h3>Health & Wellness</h3>
-            <p>💧 <b>Hydration:</b> High humidity detected. Drink 500ml more water than usual.</p>
-            <p>👕 <b>Clothing:</b> Light cotton fabrics recommended.</p>
+            <p class="label-tiny" style="color: var(--accent-emerald);">Health & Wellness</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 15px;">
+                <div style="display: flex; gap: 15px;">
+                    <i class="fa-solid fa-droplet" style="color: var(--primary); font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0;">Hydration Alert</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-dim); margin: 0;">Drink 500ml more water than your usual baseline to combat humidity fatigue.</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <i class="fa-solid fa-shirt" style="color: var(--primary); font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0;">Clothing Recommendation</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-dim); margin: 0;">Breathable, light cotton fabrics advised for maximum comfort today.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>

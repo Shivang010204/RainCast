@@ -4,38 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RainCast AI | Operational Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2.3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        #map { height: 400px; width: 100%; border-radius: 14px; z-index: 1; }
+        .leaflet-container { background: #050505 !important; }
+        
+        /* Animation for the Consensus Alert */
+        .pulse-icon-container {
+            background: rgba(99, 102, 241, 0.1); width: 50px; height: 50px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            animation: indigo-glow-pulse 2s infinite;
+        }
+        @keyframes indigo-glow-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+    </style>
 </head>
 <body>
 <div class="main-wrapper">
     <aside class="sidebar">
         <div class="sidebar-logo">RainCast AI</div>
-        
         <nav>
             <p class="sidebar-label">Analytics Mode</p>
-            <a href="/?user_mode=standard&city={{ weather.city if weather else '' }}" 
-               class="mode-btn {% if current_mode == 'standard' %}active{% endif %}">
+            <a href="/?user_mode=standard&city={{ weather.city if weather else '' }}" class="mode-btn {% if current_mode == 'standard' %}active{% endif %}">
                <i class="fa-solid fa-house-chimney"></i> Standard
             </a>
-            <a href="/?user_mode=farmer&city={{ weather.city if weather else '' }}" 
-               class="mode-btn {% if current_mode == 'farmer' %}active{% endif %}">
+            <a href="/?user_mode=farmer&city={{ weather.city if weather else '' }}" class="mode-btn {% if current_mode == 'farmer' %}active{% endif %}">
                <i class="fa-solid fa-seedling"></i> Agricultural
             </a>
-            <a href="/?user_mode=construction&city={{ weather.city if weather else '' }}" 
-               class="mode-btn {% if current_mode == 'construction' %}active{% endif %}">
+            <a href="/?user_mode=construction&city={{ weather.city if weather else '' }}" class="mode-btn {% if current_mode == 'construction' %}active{% endif %}">
                <i class="fa-solid fa-helmet-safety"></i> Infrastructure
             </a>
         </nav>
         
         <div class="sidebar-footer">
-            <a href="/history" class="history-btn-ui">
-                <i class="fa-solid fa-clock-rotate-left"></i> System History
+            <p class="sidebar-label">System Control</p>
+            <div class="mode-btn" onclick="toggleTheme()" id="theme-toggle-btn" style="cursor: pointer;">
+                <i id="theme-icon" class="fa-solid fa-moon"></i> <span id="theme-text">Dark Mode</span>
+            </div>
+            <a href="/history" class="history-btn-ui" style="text-decoration:none; display:block;">
+                <i class="fa-solid fa-clock-rotate-left"></i> History
             </a>
-            <a href="/clear" class="clear-link-ui">
-                <i class="fa-solid fa-arrows-rotate"></i> Reset Session
+            <a href="/clear" class="clear-link-ui" style="text-decoration:none; display:block;">
+                <i class="fa-solid fa-arrows-rotate"></i> Reset
             </a>
         </div>
     </aside>
@@ -46,96 +63,95 @@
                 <h1>Predictive Intelligence Hub</h1>
                 <p>Machine Learning Driven Weather Analytics</p>
             </div>
-            <div id="live-clock" class="clock-display"></div>
+            <div id="live-clock" class="clock-display glass-card" style="padding: 10px 20px;"></div>
         </header>
 
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <div class="flash-success-ui">
-                  <i class="fa-solid fa-circle-check"></i> {{ message }}
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-
-        <form method="POST" class="search-box-ui">
-            <i class="fa-solid fa-location-dot search-icon"></i>
-            <input type="text" name="city" placeholder="Search operational sector (e.g. Mumbai, New York)..." value="{{ weather.city if weather else '' }}" required>
-            <input type="hidden" name="user_mode" value="{{ current_mode }}">
-            <button type="submit">Execute Analysis</button>
-        </form>
-
-        {% if community_report %}
-        <div class="community-alert-ui">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <span><strong>Live Alert:</strong> Localized reports of <strong>{{ community_report }}</strong> confirmed in this sector.</span>
+        {% if pending_report and weather and not session.get('voted_' + weather.city) %}
+        <div class="glass-card consensus-alert" style="border-left: 4px solid var(--primary); margin-bottom: 25px; position: relative; overflow: hidden;">
+            <div style="position: absolute; right: -20px; top: -20px; font-size: 5rem; color: rgba(99, 102, 241, 0.03); transform: rotate(-15deg); pointer-events: none;">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; position: relative; z-index: 1;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="pulse-icon-container">
+                        <i class="fa-solid fa-satellite-dish" style="font-size: 1.8rem; color: var(--primary);"></i>
+                    </div>
+                    <div>
+                        <p class="label-tiny" style="color: var(--primary); margin: 0; letter-spacing: 2px; font-weight: 800;">PEER REVIEW REQUIRED</p>
+                        <h4 style="margin: 5px 0; color: var(--text-main);">Discrepancy in {{ weather.city }} Data</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0; line-height: 1.4;">
+                            AI prediction: <span style="color: var(--text-main);">{{ pending_report.ai_pred }}</span> 
+                            vs Local report: <span style="color: var(--primary);">{{ pending_report.report }}</span>. 
+                            <br><strong>Is it raining there?</strong>
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <a href="{{ url_for('vote', city=weather.city, choice='yes') }}" class="mode-btn active" style="background: var(--accent-emerald); border: none; padding: 12px 25px; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-cloud-showers-water"></i> YES
+                    </a>
+                    <a href="{{ url_for('vote', city=weather.city, choice='no') }}" class="mode-btn" style="border-color: var(--danger); color: var(--danger); padding: 12px 25px; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-sun"></i> NO
+                    </a>
+                </div>
+            </div>
         </div>
         {% endif %}
 
-        {% if error %}<p class="error-msg-ui"><i class="fa-solid fa-circle-xmark"></i> {{ error }}</p>{% endif %}
+        <form method="POST" class="search-box-ui glass-card" style="grid-column: 1 / -1; display: flex; gap: 15px;">
+            <i class="fa-solid fa-magnifying-glass" style="color: var(--text-dim); align-self: center;"></i>
+            <input type="text" name="city" placeholder="Enter Indian City (e.g. Ahmedabad, Pune)..." value="{{ weather.city if weather else '' }}" required style="background:transparent; border:none; color:white; flex:1; outline:none;">
+            <input type="hidden" name="user_mode" value="{{ current_mode }}">
+            <button type="submit" style="background:white; color:black; border:none; padding: 8px 20px; border-radius: 8px; font-weight:700; cursor:pointer;">Execute Analysis</button>
+        </form>
 
         {% if weather %}
-        <div class="dashboard-grid">
+        <div class="glass-card map-module" style="grid-column: 1/2;">
+            <div class="card-header-ui" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin:0; font-weight:800;">{{ weather.city }} <span style="font-size: 0.8rem; color: var(--text-dim); font-weight:400;">(Live Radar)</span></h2>
+                <div style="display: flex; gap: 10px;">
+                    <span class="stat-pill stat-pill-temp">{{ weather.temp }}°C</span>
+                    <span class="stat-pill stat-pill-hum">{{ weather.hum }}% Hum</span>
+                </div>
+            </div>
+            <div id="map"></div>
+        </div>
+
+        <div class="analytics-sidebar">
             <div class="glass-card">
-                <div class="card-header-ui">
-                    <h2>{{ weather.city }}</h2>
-                    <span class="status-badge">Live Geospatial View</span>
+                <p class="sidebar-label">ML Inference Result</p>
+                <h3 class="data-large {{ 'emerald-glow' if prediction == 'No Rain' else 'amber-glow' }}">
+                    {{ prediction }}
+                </h3>
+                <div style="height: 120px; margin-top: 20px;">
+                    <canvas id="tempChart"></canvas>
                 </div>
-                <div class="stats-row-ui">
-                    <div class="stat-pill">Temperature: <strong>{{ weather.temp }}°C</strong></div>
-                    <div class="stat-pill">Humidity: <strong>{{ weather.hum }}%</strong></div>
-                </div>
-                <div id="map"></div>
             </div>
 
             <div class="glass-card">
-                <h3>ML Inference: <span class="highlight-text">{{ prediction }}</span></h3>
-                
-                <div class="advice-module">
-                    <p class="sector-label">Operational Context: {{ advice.sector or 'General' }}</p>
-                    <div class="advice-grid">
-                        <div class="advice-panel pos">
-                            <h6>Standard Protocol</h6>
-                            <p>{{ advice.dos }}</p>
-                        </div>
-                        <div class="advice-panel neg">
-                            <h6>Risk Mitigation</h6>
-                            <p>{{ advice.donts }}</p>
-                        </div>
+                <p class="sidebar-label">System Protocols</p>
+                <div class="advice-panel" style="border-left: 3px solid var(--accent-emerald); background: rgba(16, 185, 129, 0.05); padding: 10px; margin-bottom: 10px; border-radius: 0 8px 8px 0;">
+                    <p style="font-size: 0.8rem; margin:0;">{{ advice.dos }}</p>
+                </div>
+                <div class="advice-panel" style="border-left: 3px solid var(--danger); background: rgba(239, 68, 68, 0.05); padding: 10px; border-radius: 0 8px 8px 0;">
+                    <p style="font-size: 0.8rem; margin:0;">{{ advice.donts }}</p>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <p class="sidebar-label">Visual Ground Truth</p>
+                <form action="/report" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="city" value="{{ weather.city }}">
+                    <label for="proof_img" class="upload-zone" style="display:block; margin-bottom:10px; cursor:pointer; text-align:center; border: 1px dashed var(--primary); padding: 10px; border-radius:8px;">
+                        <i class="fa-solid fa-camera"></i> Evidence Upload
+                    </label>
+                    <input type="file" name="proof_img" accept="image/*" id="proof_img" style="display:none;">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="submit" name="user_report" value="Rain Expected" class="mode-btn" style="border-color: var(--danger); font-size: 0.7rem; color: var(--danger);">Report Rain</button>
+                        <button type="submit" name="user_report" value="No Rain" class="mode-btn" style="border-color: var(--accent-emerald); font-size: 0.7rem; color: var(--accent-emerald);">Report Clear</button>
                     </div>
-                </div>
-
-                <div class="primary-actions-ui">
-                    <a href="{{ url_for('standard_portal', city=weather.city) }}" class="btn-ui-main">
-                        <i class="fa-solid fa-chart-line"></i> Detailed Analysis
-                    </a>
-                    <a href="/forecast" class="btn-ui-secondary">
-                        <i class="fa-solid fa-calendar-days"></i> 5-Day ML Forecast
-                    </a>
-                </div>
-
-                <div class="verification-module">
-                    <span class="module-label">Data Integrity Verification</span>
-                    <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 10px;">
-                        Upload a fresh photo to verify current conditions. Metadata will be checked for authenticity.
-                    </p>
-                    <form action="/report" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="city" value="{{ weather.city }}">
-                        <input type="hidden" name="lat" value="{{ weather.lat }}">
-                        <input type="hidden" name="lon" value="{{ weather.lon }}">
-                        
-                        <div class="file-drop-ui">
-                            <label for="proof_img"><i class="fa-solid fa-camera"></i> Attach Visual Proof</label>
-                            <input type="file" name="proof_img" accept="image/*" required id="proof_img">
-                        </div>
-
-                        <div class="report-controls-ui">
-                            <button type="submit" name="status" value="Rain" class="btn-report rain-btn">Confirm Rain</button>
-                            <button type="submit" name="status" value="No Rain" class="btn-report clear-btn">Confirm Clear</button>
-                        </div>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
         {% endif %}
@@ -144,46 +160,40 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // System Clock
     function updateClock() {
         const now = new Date();
         document.getElementById('live-clock').innerText = now.toLocaleString('en-GB', { 
-            weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateClock, 1000); updateClock();
 
-    // Mapping Logic
     {% if weather %}
-        var map = L.map('map', { zoomControl: false }).setView([{{ weather.lat }}, {{ weather.lon }}], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        
-        L.marker([{{ weather.lat }}, {{ weather.lon }}]).addTo(map)
-            .bindPopup("<b>Target Area:</b> {{ weather.city }}<br>Forecast: {{ prediction }}")
-            .openPopup();
+    setTimeout(() => {
+        var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([{{ weather.lat }}, {{ weather.lon }}], 11);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+        L.tileLayer('https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=eb270a316a7071d5320576390a880628', { opacity: 0.5 }).addTo(map);
 
-        // Overlay Community Reports on Map
-        {% for row in records %}
-            {% if row[8] == 'Rain' and row|length > 11 and row[10] != "" %}
-                // Use different colors based on row[13] (Genuine Status)
-                var markerColor = '{{ "#10b981" if row[13] == "Genuine" else "#ef4444" }}';
-                L.circle([{{ row[10] }}, {{ row[11] }}], {
-                    color: markerColor, 
-                    fillColor: markerColor, 
-                    fillOpacity: 0.2, 
-                    radius: 1200
-                }).addTo(map).bindPopup("<b>User Report:</b> Rain Detected<br>Status: {{ row[13] }}");
-            {% endif %}
-        {% endfor %}
+        var customIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: "<div style='background-color:var(--primary); width:14px; height:14px; border-radius:50%; box-shadow: 0 0 20px var(--primary); border:2px solid white;'></div>",
+            iconSize: [14, 14], iconAnchor: [7, 7]
+        });
+        L.marker([{{ weather.lat }}, {{ weather.lon }}], {icon: customIcon}).addTo(map);
+    }, 200);
     {% endif %}
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        document.getElementById('theme-icon').className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        document.getElementById('theme-text').innerText = isLight ? 'Light Mode' : 'Dark Mode';
+    }
 </script>
 
-<footer style="margin-top: 50px; padding: 20px; text-align: center; opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.05);">
-    <p>&copy; 2026 RainCast AI | Developed for MCA Final Evaluation</p>
-    <a href="{{ url_for('admin_login') }}" style="color: #64748b; text-decoration: none; font-size: 0.75rem; transition: 0.3s;">
-        <i class="fa-solid fa-lock"></i> Operational Staff Access
-    </a>
+<footer style="margin-top: 40px; padding: 20px; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center;">
+    <p style="color: var(--text-dim); font-size: 0.8rem;">&copy; 2026 RainCast AI | v3.1.0-stable</p>
+    <a href="{{ url_for('admin_login') }}" style="color:var(--primary); text-decoration:none; font-size:0.8rem;">Staff Access Portal</a>
 </footer>
 </body>
 </html>

@@ -1,14 +1,35 @@
 /* --- Global Reset & Professional Font --- */
 :root { 
-    --bg: #0f172a; 
-    --card: rgba(30, 41, 59, 0.7); 
-    --primary: #3b82f6; 
-    --primary-hover: #2563eb;
-    --text-main: #f8fafc;
-    --text-dim: #94a3b8;
+    /* TRUE BLACK THEME: High-end Tonal Scale */
+    --bg: #000000; 
+    --sidebar-bg: #050505;
+    --card: rgba(15, 15, 15, 0.7); /* Translucent for Glass Effect */
+    
+    /* UI ACCENTS */
+    --primary: #6366f1; 
+    --primary-hover: #4f46e5;
+    
+    /* DATA COLORS */
+    --temp-color: #fbbf24; /* Vivid Amber */
+    --hum-color: #10b981;  /* Emerald */
+    
+    --text-main: #ffffff; 
+    --text-dim: #a1a1aa;
     --danger: #ef4444;
     --success: #10b981;
-    --border: rgba(255, 255, 255, 0.1);
+    --border: rgba(255, 255, 255, 0.08); /* Sophisticated faint border */
+    --input-bg: #09090b;
+    --glass-blur: blur(12px);
+}
+
+body.light-theme {
+    --bg: #ffffff; 
+    --sidebar-bg: #f4f4f5;
+    --card: rgba(255, 255, 255, 0.8); 
+    --text-main: #09090b;
+    --text-dim: #71717a;
+    --border: #e4e4e7;
+    --input-bg: #ffffff;
 }
 
 * { box-sizing: border-box; }
@@ -20,188 +41,159 @@ body {
     margin: 0; 
     line-height: 1.6; 
     -webkit-font-smoothing: antialiased;
+    transition: background 0.3s ease; 
 }
 
 .main-wrapper { display: flex; min-height: 100vh; padding: 25px; gap: 25px; }
 
-/* --- Sidebar: High-End Navigation --- */
+/* --- Sidebar Upgrade --- */
 .sidebar { 
     width: 280px; 
-    background: var(--card); 
+    background: var(--sidebar-bg); 
     padding: 30px; 
     border-radius: 24px; 
     border: 1px solid var(--border); 
     display: flex;
     flex-direction: column;
-    backdrop-filter: blur(20px);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
 }
 
-.sidebar-logo { 
-    font-size: 1.4rem; 
-    font-weight: 800; 
-    color: var(--primary);
+.sidebar-logo {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    
+    /* 1. Define the Gradient */
+    background: linear-gradient(to bottom right, #ffffff, #444444);
+    
+    /* 2. Standard Property (Modern Browsers) */
+    background-clip: text;
+    
+    /* 3. Vendor Prefix (Legacy/Webkit Browsers) */
+    -webkit-background-clip: text;
+    
+    /* 4. Make the actual text transparent so the background shows through */
+    -webkit-text-fill-color: transparent; /* Required for Webkit */
+    color: transparent;                   /* Standard fallback */
+    
     margin-bottom: 40px;
-    letter-spacing: -0.5px;
+    display: inline-block; /* Ensures the background box wraps only the text */
 }
 
-.sidebar-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin-bottom: 15px;
-}
-
+/* --- Professional Button Overhaul --- */
 .mode-btn { 
     display: flex; align-items: center; gap: 12px;
-    width: 100%; padding: 14px; margin-bottom: 10px; 
-    border-radius: 12px; border: none; background: transparent; 
-    color: var(--text-dim); text-decoration: none !important; font-size: 0.95rem; 
-    font-weight: 500; transition: 0.2s; 
+    width: 100%; padding: 14px; margin-bottom: 12px; 
+    border-radius: 12px; border: 1px solid var(--border); 
+    background: rgba(255,255,255,0.03); 
+    color: var(--text-dim); text-decoration: none; font-size: 0.95rem; 
+    font-weight: 500; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    cursor: pointer;
 }
 
-.mode-btn:hover { background: rgba(255, 255, 255, 0.05); color: white; }
-.mode-btn.active { background: var(--primary); color: white !important; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); }
+.mode-btn:hover { 
+    background: rgba(255,255,255,0.08); 
+    color: var(--text-main);
+    transform: translateX(5px);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.mode-btn.active { 
+    background: var(--primary); 
+    color: white !important; 
+    border: none;
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.5); 
+}
 
 /* --- Dashboard Header --- */
 .dashboard { flex: 1; }
-h1 { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
-.dashboard-header p { color: var(--text-dim); margin: 5px 0 30px; }
+h1 { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1.5px; }
+.dashboard-header p { color: var(--text-dim); margin: 5px 0 30px; font-size: 1.1rem; }
 
-/* --- Search Engine --- */
-.search-box-ui { display: flex; gap: 12px; margin-bottom: 30px; position: relative; }
-.search-icon { position: absolute; left: 16px; top: 18px; color: var(--text-dim); }
+/* --- Search Engine (Inputs) --- */
 .search-box-ui input { 
-    flex: 1; padding: 15px 15px 15px 45px; border-radius: 14px; 
-    background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border); 
-    color: white; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
+    flex: 1; padding: 18px 18px 18px 45px; border-radius: 16px; 
+    background: var(--input-bg); border: 1px solid var(--border); 
+    color: var(--text-main); font-size: 1rem; outline: none;
+    transition: all 0.3s;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
+
+.search-box-ui input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
 .search-box-ui button { 
-    background: var(--primary); color: white; border: none; 
-    padding: 0 25px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;
+    background: #ffffff; color: #000000; border: none; 
+    padding: 0 30px; border-radius: 16px; font-weight: 750; cursor: pointer; 
+    transition: all 0.3s;
 }
-.search-box-ui button:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
-/* --- Cards & Grid --- */
-.dashboard-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; }
+.search-box-ui button:hover { 
+    background: #e4e4e7; 
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+}
+
+/* --- Glass Card Upgrade --- */
 .glass-card { 
-    background: var(--card); padding: 30px; border-radius: 24px; 
-    border: 1px solid var(--border); backdrop-filter: blur(12px); 
+    background: var(--card); padding: 30px; border-radius: 28px; 
+    border: 1px solid var(--border); 
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
 }
 
-/* --- Advice Section --- */
-.advice-module { margin: 20px 0; }
-.sector-label { font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 15px; }
-.advice-grid { display: grid; gap: 15px; }
-.advice-panel { background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
-.advice-panel h6 { margin: 0 0 5px; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; color: var(--text-dim); }
-.advice-panel p { margin: 0; font-size: 0.95rem; color: var(--text-main); line-height: 1.5; }
-
-/* --- ACTION BUTTONS (Detailed View & Forecast) --- */
-.primary-actions-ui { display: flex; gap: 12px; margin: 25px 0; }
-.btn-ui-main, .btn-ui-secondary { 
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 14px; border-radius: 12px; font-weight: 700; text-decoration: none !important; 
-    font-size: 0.85rem; transition: 0.3s;
-}
-.btn-ui-main { background: var(--primary); color: white !important; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
-.btn-ui-secondary { background: rgba(255, 255, 255, 0.05); color: white !important; border: 1px solid var(--border); }
-.btn-ui-main:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
-.btn-ui-secondary:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
-
-/* --- Verification UI --- */
-.verification-module { border-top: 1px solid var(--border); padding-top: 25px; margin-top: 25px; }
-.module-label { font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; display: block; }
-.file-drop-ui label { 
-    display: block; padding: 15px; border: 2px dashed var(--border); 
-    border-radius: 12px; text-align: center; cursor: pointer; color: var(--text-dim); 
-    transition: 0.3s;
-}
-.file-drop-ui label:hover { border-color: var(--primary); color: white; background: rgba(59, 130, 246, 0.05); }
-.file-drop-ui input { display: none; }
-
-.report-controls-ui { display: flex; gap: 12px; margin-top: 15px; }
-.btn-report { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; color: white; text-transform: uppercase; font-size: 0.75rem; transition: 0.3s; }
-.rain-btn { background: var(--danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
-.clear-btn { background: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
-.btn-report:hover { filter: brightness(1.2); transform: translateY(-2px); }
-
-/* --- Sidebar Footer & Reset Links --- */
-.sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; }
-.history-btn-ui, .clear-link-ui {
-    display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; 
-    text-decoration: none !important; font-size: 0.85rem; font-weight: 600; transition: 0.2s;
-}
-.history-btn-ui { color: var(--primary) !important; background: rgba(59, 130, 246, 0.1); margin-bottom: 8px; }
-.history-btn-ui:hover { background: var(--primary); color: white !important; }
-
-.clear-link-ui { color: var(--danger) !important; background: rgba(239, 68, 68, 0.1); }
-.clear-link-ui:hover { background: var(--danger); color: white !important; }
-
-#map { height: 350px; border-radius: 18px; border: 1px solid var(--border); }
-
-/* --- HISTORY PAGE & GLASSMORPHISM UPDATES --- */
-
-.glass-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 30px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+.glass-card:hover {
+    border-color: rgba(255,255,255,0.15);
 }
 
-.history-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 25px;
+/* --- Data Stat Pills --- */
+.stat-pill {
+    padding: 10px 20px; border-radius: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.stat-pill-temp { background: rgba(251, 191, 36, 0.1); color: var(--temp-color); border: 1px solid rgba(251, 191, 36, 0.2); }
+.stat-pill-hum { background: rgba(16, 185, 129, 0.1); color: var(--hum-color); border: 1px solid rgba(16, 185, 129, 0.2); }
+
+/* --- Map Enhancement --- */
+#map { 
+    height: 400px; border-radius: 24px; border: 1px solid var(--border); 
+    filter: grayscale(1) invert(0.9) contrast(1.2); /* Premium dark map look */
 }
 
-.history-table th {
-    color: #94a3b8;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 15px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+/* --- Professional Report Buttons --- */
+.history-btn-ui, .clear-link-ui { 
+    border: 1px solid var(--border) !important; 
+    background: rgba(255,255,255,0.03) !important; 
+    color: var(--text-dim) !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    margin-top: 10px;
+    transition: all 0.3s !important;
 }
 
-.history-table td {
-    padding: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    vertical-align: middle;
+.history-btn-ui:hover { 
+    background: rgba(99, 102, 241, 0.1) !important; 
+    color: var(--primary) !important; 
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
 }
 
-.btn-ui-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    text-decoration: none;
-    transition: all 0.3s ease;
+.clear-link-ui:hover { 
+    background: rgba(239, 68, 68, 0.1) !important; 
+    color: var(--danger) !important; 
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
 }
 
-.btn-ui-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
+/* --- Chart Glowing Effect --- */
+canvas { filter: drop-shadow(0px 10px 20px rgba(251, 191, 36, 0.15)); }
 
-.proof-thumb {
-    width: 60px; 
-    height: 45px; 
-    object-fit: cover; 
-    border-radius: 6px; 
-    border: 1px solid rgba(59, 130, 246, 0.5);
-    transition: transform 0.2s;
-}
-
-.proof-thumb:hover {
-    transform: scale(1.1);
-    border-color: #3b82f6;
+#map {
+    filter: saturate(1.2) brightness(0.9); /* Makes the greens greener but keeps it from being too bright */
+    border-radius: 15px;
+    overflow: hidden;
 }

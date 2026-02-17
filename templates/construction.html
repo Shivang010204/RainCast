@@ -2,36 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Construction Portal | RainCast AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: var(--bg); color: var(--text-main); padding: 25px; }
+        
+        .status-bar-bg {
+            background: rgba(255,255,255,0.05);
+            height: 8px;
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+        
+        .status-bar-fill {
+            background: var(--primary);
+            height: 100%;
+            box-shadow: 0 0 10px var(--primary);
+            transition: width 1s ease-in-out;
+        }
+
+        .safety-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .safety-check i { color: var(--accent-emerald); }
+    </style>
 </head>
 <body>
-    <div class="dashboard" style="margin-left: 0; padding: 40px;">
-        <a href="/?city={{ city }}" style="color: #3b82f6; text-decoration: none;">← Back to Dashboard</a>
-        <h1>🏗️ Construction Safety Monitor</h1>
-        <p>Site Location: <b>{{ city }}</b></p>
+    <div class="dashboard" style="max-width: 1000px; margin: auto;">
+        <a href="/?city={{ city }}" class="staff-portal-link" style="display: inline-block; margin-bottom: 20px;">
+            <i class="fa-solid fa-arrow-left"></i> Return to Command Center
+        </a>
 
-        <div class="dashboard-grid">
+        <header style="margin-bottom: 30px;">
+            <div class="sidebar-logo" style="margin-bottom: 5px;">INFRASTRUCTURE TERMINAL</div>
+            <p class="label-tiny">Location: <span style="color: var(--text-main);">{{ city }}</span> | Active Monitoring</p>
+        </header>
+
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            
             <div class="glass-card">
-                <h3>Concrete Curing Alert</h3>
-                <p>Humidity is high. Concrete setting time will be extended by approximately 4 hours. Ensure proper covering if rain begins.</p>
-                <div style="background: #3b82f6; height: 10px; width: 60%; border-radius: 5px; margin-top: 10px;"></div>
-                <small>Current Workability: 60%</small>
+                <p class="label-tiny" style="color: var(--primary);">Material Science</p>
+                <h3 style="margin: 10px 0;"><i class="fa-solid fa-hard-hat"></i> Concrete Curing</h3>
+                <p style="font-size: 0.85rem; color: var(--text-dim); line-height: 1.4;">
+                    Humidity levels are elevated. Expect a <strong>+4h delay</strong> in set-time. 
+                    Structure integrity is maintained, but covering is mandatory.
+                </p>
+                <div class="status-bar-bg">
+                    <div class="status-bar-fill" style="width: 60%;"></div>
+                </div>
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; margin-top: 8px; color: var(--text-dim);">
+                    Workability Index: 60%
+                </p>
             </div>
 
             <div class="glass-card">
-                <h3>Wind & Height Safety</h3>
-                <p>Current Wind: 12 km/h</p>
-                <p style="color: #4ade80;">✅ Crane operations are safe.</p>
-                <p style="color: #4ade80;">✅ Scaffolding work permitted.</p>
+                <p class="label-tiny" style="color: var(--accent-emerald);">Safety Clearance</p>
+                <h3 style="margin: 10px 0;"><i class="fa-solid fa-wind"></i> Wind & Height</h3>
+                <div class="safety-check">
+                    <i class="fa-solid fa-circle-check"></i> 
+                    <span>Crane Operations: <b style="color: var(--accent-emerald);">CLEAR</b></span>
+                </div>
+                <div class="safety-check">
+                    <i class="fa-solid fa-circle-check"></i> 
+                    <span>Scaffolding Work: <b style="color: var(--accent-emerald);">PERMITTED</b></span>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.8rem; color: var(--text-dim);">
+                    Current Velocity: <span style="color: var(--text-main);">12 km/h</span>
+                </p>
             </div>
         </div>
 
-        <div class="glass-card" style="margin-top: 20px; border-left: 5px solid #f59e0b;">
-            <h3 style="color: #f59e0b;">⚠️ Material Protection Notice</h3>
-            <p>Rain prediction is active. Please ensure all cement bags and electrical equipment are elevated at least 6 inches off the ground and covered with waterproof tarps.</p>
+        <div class="glass-card" style="margin-top: 20px; border-left: 4px solid var(--accent-amber);">
+            <p class="label-tiny" style="color: var(--accent-amber);">Urgent Mitigation</p>
+            <h3 style="color: var(--accent-amber); margin: 5px 0 10px 0;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Material Protection Required
+            </h3>
+            <p style="font-size: 0.9rem; color: var(--text-main);">
+                Rain prediction is <strong>ACTIVE</strong>. Secure all cement inventory and electrical sub-stations. 
+                Ensure 6-inch elevation for ground-level storage.
+            </p>
         </div>
     </div>
+
+    <script>
+        // Optional: Add a subtle pulse to the warning card
+        setInterval(() => {
+            const warning = document.querySelector('.glass-card[style*="border-left"]');
+            if(warning) {
+                warning.style.boxShadow = warning.style.boxShadow === 'none' ? '0 0 15px rgba(251, 191, 36, 0.1)' : 'none';
+            }
+        }, 1000);
+    </script>
 </body>
 </html>
