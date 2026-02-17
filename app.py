@@ -6,8 +6,7 @@ import os
 import json
 import pandas as pd
 import time
-import shutil
-from datetime import datetime, timedelta
+from datetime import datetime
 from werkzeug.utils import secure_filename
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -18,7 +17,6 @@ app.secret_key = "raincast_secure_key_123"
 # ================= CONFIGURATION =================
 API_KEY = "ad89b1ffcd8e32f477047bed964e118b"
 WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
-FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 MODEL_PATH = "model/raincast_model.pkl"
 HISTORY_FILE = "data/prediction_history.csv"
 JSON_HISTORY_FILE = "data/prediction_history.json" 
@@ -38,13 +36,11 @@ except:
 # ================= HELPER FUNCTIONS =================
 
 def get_image_metadata(image_path):
-    """ Extracts EXIF data to verify photo authenticity """
     try:
         with Image.open(image_path) as img:
             exif_data = img._getexif()
             if not exif_data:
                 return None, False
-
             photo_time = None
             has_gps = False
             for tag, value in exif_data.items():
@@ -63,55 +59,32 @@ def sync_to_json():
         if os.path.exists(HISTORY_FILE):
             df = pd.read_csv(HISTORY_FILE)
             df.to_json(JSON_HISTORY_FILE, orient='records', indent=4)
-    except Exception as e:
-        print(f"Sync Error: {e}")
-        
+    except: pass
+
 def generate_advice(temp, hum, wind, prediction, mode):
-    advice = {
-        "clothing": "Standard professional attire.",
-        "activity": "Operational tasks normal.",
-        "dos": "Monitor local sky conditions.",
-        "donts": "Ignore sudden weather shifts.",
-        "sector": "General Public"
-    }
-    
+    advice = {"clothing": "Standard professional attire.", "activity": "Normal operations.", "dos": "Monitor sky.", "donts": "No shifts.", "sector": "General"}
     if prediction == "Rain Expected":
-        advice["clothing"] = "Carry weather-resistant gear/umbrella."
-        advice["activity"] = "Prioritize indoor operations."
-
+        advice["clothing"] = "Carry umbrella."
+        advice["activity"] = "Indoor tasks."
     if mode == "farmer":
-        advice["sector"] = "Agricultural Sector"
-        if wind > 10:
-            advice["dos"], advice["donts"] = "Secure irrigation lines and nets.", "Do not apply chemical sprays."
-        elif prediction == "Rain Expected":
-            advice["dos"], advice["donts"] = "Clear drainage for field runoff.", "Do not apply nitrogen fertilizers."
-        else:
-            advice["dos"], advice["donts"] = "Ideal for sowing and harvesting.", "Do not over-irrigate unnecessarily."
-
+        advice["sector"] = "Agriculture"
+        advice["dos"] = "Secure irrigation." if wind > 10 else "Drainage check."
     elif mode == "construction":
-        advice["sector"] = "Infrastructure & Safety"
-        if prediction == "Rain Expected":
-            advice["dos"], advice["donts"] = "Cover cement stock and power tools.", "Do not perform concrete pouring."
-        elif wind > 15:
-            advice["dos"], advice["donts"] = "Ensure scaffolding is anchored.", "Suspend all high-altitude crane ops."
-        else:
-            advice["dos"], advice["donts"] = "Safe for external structural work.", "Verify integrity of electrical pits."
-            
+        advice["sector"] = "Infrastructure"
+        advice["dos"] = "Cover cement." if prediction == "Rain Expected" else "Anchor scaffolding."
     return advice
 
-# ================= ROUTES =================
+# ================= USER ROUTES =================
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    prediction, weather, error, community_report, advice = [None]*5
-    pending_report = None 
+    prediction, weather, error, advice, pending_report = [None]*5
     records = []
 
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             all_rows = list(csv.reader(f))
-            if len(all_rows) > 1:
-                records = all_rows[1:]
+            records = all_rows[1:] if len(all_rows) > 1 else []
 
     current_mode = request.form.get("user_mode") or request.args.get("user_mode") or session.get('last_mode', 'standard')
     city = request.form.get("city") or request.args.get("city") or session.get('last_city')
@@ -120,90 +93,33 @@ def index():
         city = city.strip()
         session['last_city'] = city
         session['last_mode'] = current_mode
-        
         try:
-            params = {"q": city, "appid": API_KEY, "units": "metric"}
-            res = requests.get(WEATHER_URL, params=params).json()
-            
-            if res.get("cod") != 200: 
-                error = "Operational Target: City not found."
+            res = requests.get(WEATHER_URL, params={"q": city, "appid": API_KEY, "units": "metric"}).json()
+            if res.get("cod") != 200:
+                error = "City not found."
                 session.pop('last_city', None)
             else:
                 temp, hum, press, wind = res["main"]["temp"], res["main"]["humidity"], res["main"]["pressure"], res["wind"]["speed"]
                 lon, lat = res["coord"]["lon"], res["coord"]["lat"]
-                
-                # ML Inference
                 result = model.predict([[temp, hum, press, wind]])[0]
                 prediction = "Rain Expected" if result == 1 else "No Rain"
-                
                 weather = {"city": city, "temp": temp, "hum": hum, "wind": wind, "lon": lon, "lat": lat}
                 advice = generate_advice(temp, hum, wind, prediction, current_mode)
 
-                # Conflict Detection
                 for row in reversed(records):
                     if row[1].lower() == city.lower() and row[8] != "" and row[8] != row[6]:
-                        pending_report = {
-                            "report": row[8],
-                            "ai_pred": row[6]
-                        }
+                        pending_report = {"report": row[8], "ai_pred": row[6]}
                         break 
 
-                # Log search to CSV
-                file_exists = os.path.isfile(HISTORY_FILE)
                 with open(HISTORY_FILE, "a", newline="", encoding="utf-8") as f:
                     writer = csv.writer(f)
-                    if not file_exists:
+                    if os.path.getsize(HISTORY_FILE) == 0:
                         writer.writerow(["Time", "City", "Temp", "Hum", "Press", "Wind", "ML", "API", "Report", "Mode", "Lat", "Lon", "Proof", "Status", "Yes_Votes", "No_Votes"])
-                    
-                    writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), city, temp, hum, press, wind, prediction, "OK", "", current_mode, lat, lon, "", "Pending", 0, 0])
-                
-                sync_to_json() 
+                    writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M"), city, temp, hum, press, wind, prediction, "OK", "", current_mode, lat, lon, "", "Pending", 0, 0])
+                sync_to_json()
+        except: error = "API Connection Failure."
 
-        except Exception as e: 
-            error = f"System Error: API Connection Failure."
-
-    return render_template("dashboard.html", 
-                           prediction=prediction, 
-                           weather=weather, 
-                           error=error, 
-                           advice=advice, 
-                           current_mode=current_mode, 
-                           records=records,
-                           pending_report=pending_report)
-
-@app.route("/vote/<city>/<choice>")
-def vote(city, choice):
-    if os.path.exists(HISTORY_FILE):
-        rows = []
-        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
-            rows = list(csv.reader(f))
-        
-        for i in range(len(rows) - 1, 0, -1):
-            if rows[i][1].lower() == city.lower() and rows[i][8] != "":
-                while len(rows[i]) < 16: rows[i].append("0")
-                
-                try:
-                    yes_votes = int(rows[i][14]) if rows[i][14] else 0
-                    no_votes = int(rows[i][15]) if rows[i][15] else 0
-                    
-                    if choice == 'yes':
-                        yes_votes += 1
-                        rows[i][14] = str(yes_votes)
-                    else:
-                        no_votes += 1
-                        rows[i][15] = str(no_votes)
-                    
-                    if yes_votes >= 5: rows[i][13] = "Community Verified"
-                    elif no_votes >= 5: rows[i][13] = "Community Rejected"
-                except:
-                    rows[i][14], rows[i][15] = "1", "0"
-                break 
-        
-        with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
-            csv.writer(f).writerows(rows)
-            
-    session[f'voted_{city}'] = True 
-    return redirect(url_for('index', city=city))
+    return render_template("dashboard.html", prediction=prediction, weather=weather, error=error, advice=advice, current_mode=current_mode, records=records, pending_report=pending_report)
 
 @app.route('/report', methods=['POST'])
 def report():
@@ -211,43 +127,63 @@ def report():
     status = request.form.get('user_report') or request.form.get('status')
     file = request.files.get('proof_img')
     
-    img_filename = ""
-    trust_status = "No Photo"
+    if not file or file.filename == '':
+        flash("Action Blocked: Visual evidence is mandatory.")
+        return redirect(url_for("index", city=city))
 
-    if file and file.filename != '':
-        ts = int(time.time())
-        img_filename = secure_filename(f"{city}_{ts}_{file.filename}")
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], img_filename)
-        file.save(filepath)
-        
-        photo_time, _ = get_image_metadata(filepath)
-        if photo_time:
-            try:
-                taken_at = datetime.strptime(photo_time[:10], '%Y:%m:%d')
-                trust_status = "Genuine" if taken_at.date() == datetime.now().date() else "Old Photo"
-            except: trust_status = "Metadata Error"
-        else: trust_status = "Flagged (No Metadata)"
+    ts = int(time.time())
+    img_filename = secure_filename(f"{city}_{ts}_{file.filename}")
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], img_filename)
+    file.save(filepath)
+    
+    photo_time, _ = get_image_metadata(filepath)
+    if not photo_time:
+        os.remove(filepath)
+        flash("Rejection: Photo lacks timestamp metadata. Use a live camera shot.")
+        return redirect(url_for("index", city=city))
+
+    try:
+        taken_at = datetime.strptime(photo_time[:10], '%Y:%m:%d')
+        trust_status = "Genuine" if taken_at.date() == datetime.now().date() else "Old Photo"
+    except: trust_status = "Metadata Error"
     
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             records = list(csv.reader(f))
-        
         for i in range(len(records)-1, 0, -1):
             if records[i][1].lower() == city.lower() and records[i][8] == "":
                 while len(records[i]) < 16: records[i].append("")
-                records[i][8] = status
-                records[i][12] = img_filename
-                records[i][13] = trust_status
+                records[i][8], records[i][12], records[i][13] = status, img_filename, trust_status
                 break
-        
         with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
             csv.writer(f).writerows(records)
         sync_to_json()
         flash(f"Report Logged: {trust_status}")
-
     return redirect(url_for("index", city=city))
 
-# ================= ADMIN PANEL LOGIC =================
+@app.route("/vote/<city>/<choice>")
+def vote(city, choice):
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            rows = list(csv.reader(f))
+        for i in range(len(rows)-1, 0, -1):
+            if rows[i][1].lower() == city.lower() and rows[i][8] != "":
+                while len(rows[i]) < 16: rows[i].append("0")
+                y, n = int(rows[i][14] or 0), int(rows[i][15] or 0)
+                if choice == 'yes': rows[i][14] = str(y + 1)
+                else: rows[i][15] = str(n + 1)
+                if (y+1) >= 5: rows[i][13] = "Community Verified"
+                break
+        with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
+            csv.writer(f).writerows(rows)
+    return redirect(url_for('index', city=city))
+
+@app.route("/clear")
+def clear():
+    session.pop('last_city', None)
+    return redirect(url_for('index'))
+
+# ================= ADMIN ROUTES =================
 
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
@@ -283,10 +219,21 @@ def delete_record(index):
             del data[actual_idx]
             with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
-                writer.writerow(header)
-                writer.writerows(data)
+                writer.writerow(header); writer.writerows(data)
             sync_to_json()
-            flash("Purged.")
+            flash("Record Purged.")
+    return redirect(url_for('admin_panel'))
+
+@app.route("/clear_all_data")
+def clear_all_data():
+    if not session.get('is_admin'): return redirect(url_for('admin_login'))
+    header = ["Time", "City", "Temp", "Hum", "Press", "Wind", "ML", "API", "Report", "Mode", "Lat", "Lon", "Proof", "Status", "Yes_Votes", "No_Votes"]
+    with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
+        csv.writer(f).writerow(header)
+    for f in os.listdir(app.config['UPLOAD_FOLDER']):
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], f))
+    sync_to_json()
+    flash("System Reset Successful.")
     return redirect(url_for('admin_panel'))
 
 @app.route("/admin_logout")

@@ -65,6 +65,15 @@
             </div>
             <div id="live-clock" class="clock-display glass-card" style="padding: 10px 20px;"></div>
         </header>
+        {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div style="padding: 10px; margin: 10px; background: #ff4444; color: white; border-radius: 5px; text-align: center;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
         {% if pending_report and weather and not session.get('voted_' + weather.city) %}
         <div class="glass-card consensus-alert" style="border-left: 4px solid var(--primary); margin-bottom: 25px; position: relative; overflow: hidden;">
@@ -139,20 +148,37 @@
             </div>
 
             <div class="glass-card">
-                <p class="sidebar-label">Visual Ground Truth</p>
-                <form action="/report" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="city" value="{{ weather.city }}">
-                    <label for="proof_img" class="upload-zone" style="display:block; margin-bottom:10px; cursor:pointer; text-align:center; border: 1px dashed var(--primary); padding: 10px; border-radius:8px;">
-                        <i class="fa-solid fa-camera"></i> Evidence Upload
-                    </label>
-                    <input type="file" name="proof_img" accept="image/*" id="proof_img" style="display:none;">
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <button type="submit" name="user_report" value="Rain Expected" class="mode-btn" style="border-color: var(--danger); font-size: 0.7rem; color: var(--danger);">Report Rain</button>
-                        <button type="submit" name="user_report" value="No Rain" class="mode-btn" style="border-color: var(--accent-emerald); font-size: 0.7rem; color: var(--accent-emerald);">Report Clear</button>
-                    </div>
-                </form>
-            </div>
+    <p class="sidebar-label">Visual Ground Truth</p>
+    <form action="/report" method="POST" enctype="multipart/form-data" id="reportForm">
+        <input type="hidden" name="city" value="{{ weather.city }}">
+        
+        <label for="proof_img" id="upload-label" class="upload-zone" style="display:block; margin-bottom:10px; cursor:pointer; text-align:center; border: 2px dashed var(--primary); padding: 15px; border-radius:8px; transition: 0.3s;">
+            <i class="fa-solid fa-camera"></i> <span id="label-text">Photo Proof Required</span>
+        </label>
+        
+        <input type="file" name="proof_img" accept="image/*" id="proof_img" required style="display:none;" onchange="validateFile()">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button type="submit" name="user_report" value="Rain Expected" class="mode-btn" style="border-color: var(--danger); font-size: 0.7rem; color: var(--danger);">Report Rain</button>
+            <button type="submit" name="user_report" value="No Rain" class="mode-btn" style="border-color: var(--accent-emerald); font-size: 0.7rem; color: var(--accent-emerald);">Report Clear</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function validateFile() {
+    const fileInput = document.getElementById('proof_img');
+    const label = document.getElementById('upload-label');
+    const labelText = document.getElementById('label-text');
+    
+    if (fileInput.files.length > 0) {
+        // Change UI to show file is selected
+        label.style.border = "2px solid var(--accent-emerald)";
+        label.style.background = "rgba(16, 185, 129, 0.1)";
+        labelText.innerText = "Photo Attached: " + fileInput.files[0].name.substring(0, 15) + "...";
+    }
+}
+</script>
         </div>
         {% endif %}
     </main>

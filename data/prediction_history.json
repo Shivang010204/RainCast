@@ -1,0 +1,20 @@
+[
+    {
+        "Time":"2026-02-17 14:23",
+        "City":"Gandhinagar",
+        "Temp":28.99,
+        "Hum":26,
+        "Press":1009,
+        "Wind":3.09,
+        "ML":"No Rain",
+        "API":"OK",
+        "Report":null,
+        "Mode":"standard",
+        "Lat":23.2167,
+        "Lon":72.6833,
+        "Proof":null,
+        "Status":"Pending",
+        "Yes_Votes":0,
+        "No_Votes":0
+    }
+]
