@@ -164,18 +164,51 @@ def report():
 @app.route("/vote/<city>/<choice>")
 def vote(city, choice):
     if os.path.exists(HISTORY_FILE):
+        rows = []
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             rows = list(csv.reader(f))
-        for i in range(len(rows)-1, 0, -1):
-            if rows[i][1].lower() == city.lower() and rows[i][8] != "":
-                while len(rows[i]) < 16: rows[i].append("0")
-                y, n = int(rows[i][14] or 0), int(rows[i][15] or 0)
-                if choice == 'yes': rows[i][14] = str(y + 1)
-                else: rows[i][15] = str(n + 1)
-                if (y+1) >= 5: rows[i][13] = "Community Verified"
-                break
-        with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
-            csv.writer(f).writerows(rows)
+        
+        updated = False
+        # Search from bottom (newest) to top
+        for i in range(len(rows) - 1, 0, -1):
+            # 1. Match city
+            # 2. Match rows that HAVE a user report (index 8)
+            if rows[i][1].lower() == city.lower() and rows[i][8].strip() != "":
+                
+                # Ensure columns 14 and 15 exist for Yes/No votes
+                while len(rows[i]) < 16:
+                    rows[i].append("0")
+                
+                # Update the count
+                if choice == 'yes':
+                    current_val = int(rows[i][14] if rows[i][14] else 0)
+                    rows[i][14] = str(current_val + 1)
+                else:
+                    current_val = int(rows[i][15] if rows[i][15] else 0)
+                    rows[i][15] = str(current_val + 1)
+                
+                # Logic to upgrade status based on community consensus
+                y_count = int(rows[i][14])
+                n_count = int(rows[i][15])
+                
+                if y_count >= 3:
+                    rows[i][13] = "Community Verified"
+                elif n_count >= 3:
+                    rows[i][13] = "Consensus: False Report"
+                
+                updated = True
+                break 
+
+        if updated:
+            with open(HISTORY_FILE, "w", newline="", encoding="utf-8") as f:
+                csv.writer(f).writerows(rows)
+            sync_to_json()
+            # This is the key: set the session so the HTML {% if %} block hides the card
+            session[f'voted_{city}'] = True
+            flash("Consensus data updated!")
+        else:
+            flash("Could not find an active report to vote on.")
+
     return redirect(url_for('index', city=city))
 
 @app.route("/clear")

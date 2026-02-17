@@ -1,11 +1,11 @@
 [
     {
-        "Time":"2026-02-17 14:23",
+        "Time":"2026-02-17 16:01",
         "City":"Gandhinagar",
-        "Temp":28.99,
-        "Hum":26,
+        "Temp":29.99,
+        "Hum":25,
         "Press":1009,
-        "Wind":3.09,
+        "Wind":1.54,
         "ML":"No Rain",
         "API":"OK",
         "Report":null,
