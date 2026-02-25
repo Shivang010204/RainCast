@@ -1,199 +1,170 @@
-/* --- Global Reset & Professional Font --- */
-:root { 
-    /* TRUE BLACK THEME: High-end Tonal Scale */
-    --bg: #000000; 
-    --sidebar-bg: #050505;
-    --card: rgba(15, 15, 15, 0.7); /* Translucent for Glass Effect */
-    
-    /* UI ACCENTS */
-    --primary: #6366f1; 
-    --primary-hover: #4f46e5;
-    
-    /* DATA COLORS */
-    --temp-color: #fbbf24; /* Vivid Amber */
-    --hum-color: #10b981;  /* Emerald */
-    
-    --text-main: #ffffff; 
-    --text-dim: #a1a1aa;
-    --danger: #ef4444;
-    --success: #10b981;
-    --border: rgba(255, 255, 255, 0.08); /* Sophisticated faint border */
-    --input-bg: #09090b;
-    --glass-blur: blur(12px);
+:root {
+    --bg-image: url('https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    --glass-bg: rgba(25, 30, 40, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --primary-glow: #00d4ff;
+    --accent-red: #ff5f5f;
+    --accent-green: #4ade80;
+    --text-main: #ffffff;
+    --text-dim: #94a3b8;
 }
 
-body.light-theme {
-    --bg: #ffffff; 
-    --sidebar-bg: #f4f4f5;
-    --card: rgba(255, 255, 255, 0.8); 
-    --text-main: #09090b;
-    --text-dim: #71717a;
-    --border: #e4e4e7;
-    --input-bg: #ffffff;
-}
-
-* { box-sizing: border-box; }
-
-body { 
-    background: var(--bg); 
-    color: var(--text-main); 
-    font-family: 'Inter', -apple-system, sans-serif; 
-    margin: 0; 
-    line-height: 1.6; 
-    -webkit-font-smoothing: antialiased;
-    transition: background 0.3s ease; 
-}
-
-.main-wrapper { display: flex; min-height: 100vh; padding: 25px; gap: 25px; }
-
-/* --- Sidebar Upgrade --- */
-.sidebar { 
-    width: 280px; 
-    background: var(--sidebar-bg); 
-    padding: 30px; 
-    border-radius: 24px; 
-    border: 1px solid var(--border); 
-    display: flex;
-    flex-direction: column;
-    backdrop-filter: var(--glass-blur);
-    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-}
-
-.sidebar-logo {
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    
-    /* 1. Define the Gradient */
-    background: linear-gradient(to bottom right, #ffffff, #444444);
-    
-    /* 2. Standard Property (Modern Browsers) */
-    background-clip: text;
-    
-    /* 3. Vendor Prefix (Legacy/Webkit Browsers) */
-    -webkit-background-clip: text;
-    
-    /* 4. Make the actual text transparent so the background shows through */
-    -webkit-text-fill-color: transparent; /* Required for Webkit */
-    color: transparent;                   /* Standard fallback */
-    
-    margin-bottom: 40px;
-    display: inline-block; /* Ensures the background box wraps only the text */
-}
-
-/* --- Professional Button Overhaul --- */
-.mode-btn { 
-    display: flex; align-items: center; gap: 12px;
-    width: 100%; padding: 14px; margin-bottom: 12px; 
-    border-radius: 12px; border: 1px solid var(--border); 
-    background: rgba(255,255,255,0.03); 
-    color: var(--text-dim); text-decoration: none; font-size: 0.95rem; 
-    font-weight: 500; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-    cursor: pointer;
-}
-
-.mode-btn:hover { 
-    background: rgba(255,255,255,0.08); 
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: var(--text-main);
-    transform: translateX(5px);
-    border-color: rgba(255,255,255,0.2);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
 }
 
-.mode-btn.active { 
-    background: var(--primary); 
-    color: white !important; 
-    border: none;
-    box-shadow: 0 0 25px rgba(99, 102, 241, 0.5); 
+/* --- SEARCH INPUT FIX --- */
+input[type="text"] {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: white !important;
+    transition: 0.3s;
 }
 
-/* --- Dashboard Header --- */
-.dashboard { flex: 1; }
-h1 { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1.5px; }
-.dashboard-header p { color: var(--text-dim); margin: 5px 0 30px; font-size: 1.1rem; }
-
-/* --- Search Engine (Inputs) --- */
-.search-box-ui input { 
-    flex: 1; padding: 18px 18px 18px 45px; border-radius: 16px; 
-    background: var(--input-bg); border: 1px solid var(--border); 
-    color: var(--text-main); font-size: 1rem; outline: none;
-    transition: all 0.3s;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+/* Prevents the "bad white box" look when clicking to search */
+input[type="text"]:focus {
+    background: rgba(0, 0, 0, 0.5) !important;
+    outline: none !important;
+    border-color: var(--primary-glow) !important;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
-.search-box-ui input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), inset 0 2px 4px rgba(0,0,0,0.5);
-}
-
-.search-box-ui button { 
-    background: #ffffff; color: #000000; border: none; 
-    padding: 0 30px; border-radius: 16px; font-weight: 750; cursor: pointer; 
-    transition: all 0.3s;
-}
-
-.search-box-ui button:hover { 
-    background: #e4e4e7; 
-    transform: scale(1.02);
-    box-shadow: 0 0 20px rgba(255,255,255,0.2);
-}
-
-/* --- Glass Card Upgrade --- */
-.glass-card { 
-    background: var(--card); padding: 30px; border-radius: 28px; 
-    border: 1px solid var(--border); 
-    backdrop-filter: var(--glass-blur);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    transition: transform 0.3s ease;
+/* --- THE CORE GLASS CARD --- */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: 0.3s ease;
+    position: relative; /* Ensures z-index works */
 }
 
 .glass-card:hover {
-    border-color: rgba(255,255,255,0.15);
+    border-color: var(--primary-glow);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
 }
 
-/* --- Data Stat Pills --- */
-.stat-pill {
-    padding: 10px 20px; border-radius: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+/* --- PREVENT BOX COLLISIONS --- */
+/* This ensures the middle column elements stack correctly without overlapping */
+.center-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
-.stat-pill-temp { background: rgba(251, 191, 36, 0.1); color: var(--temp-color); border: 1px solid rgba(251, 191, 36, 0.2); }
-.stat-pill-hum { background: rgba(16, 185, 129, 0.1); color: var(--hum-color); border: 1px solid rgba(16, 185, 129, 0.2); }
 
-/* --- Map Enhancement --- */
+/* Force the Hourly box to stay in place and not go behind the ML prediction */
+.hourly-scroll {
+    z-index: 5;
+    order: 1; /* Always first below search */
+}
+
+.prediction-hero {
+    z-index: 4;
+    order: 2; /* Always below hourly */
+}
+
+.peer-review-box {
+    z-index: 3;
+    order: 3; /* Always below prediction */
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- BUTTONS --- */
+.mode-btn {
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+}
+
+.mode-btn.active {
+    background: var(--primary-glow);
+    color: black;
+    font-weight: 700;
+}
+
+.btn-yes { background: var(--accent-green) !important; color: black !important; font-weight: 800; border: none !important; }
+.btn-no { background: var(--accent-red) !important; color: white !important; font-weight: 800; border: none !important; }
+
+/* --- MAP STYLING --- */
 #map { 
-    height: 400px; border-radius: 24px; border: 1px solid var(--border); 
-    filter: grayscale(1) invert(0.9) contrast(1.2); /* Premium dark map look */
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
 }
 
-/* --- Professional Report Buttons --- */
-.history-btn-ui, .clear-link-ui { 
-    border: 1px solid var(--border) !important; 
-    background: rgba(255,255,255,0.03) !important; 
-    color: var(--text-dim) !important;
-    padding: 12px !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    margin-top: 10px;
-    transition: all 0.3s !important;
+/* --- LAYOUT WRAPPER --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
-.history-btn-ui:hover { 
-    background: rgba(99, 102, 241, 0.1) !important; 
-    color: var(--primary) !important; 
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+
+
+/* --- RESPONSIVE FIXES FOR NO-SCROLL LAYOUT --- */
+
+/* Adjustments for smaller laptop screens */
+@media (max-height: 850px) {
+    .big-temp { 
+        font-size: 3.5rem !important; 
+        margin: 5px 0 !important;
+    }
+    
+    #map { 
+        height: 130px !important; 
+    }
+    
+    .intel-widget h3 { 
+        font-size: 1.3rem !important; 
+    }
+
+    .dashboard-container {
+        gap: 10px !important;
+        padding: 10px !important;
+    }
+
+    .glass-panel {
+        padding: 10px !important;
+    }
+    
+    .ios-widget {
+        padding: 10px !important;
+    }
 }
 
-.clear-link-ui:hover { 
-    background: rgba(239, 68, 68, 0.1) !important; 
-    color: var(--danger) !important; 
-    border-color: var(--danger) !important;
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
-}
-
-/* --- Chart Glowing Effect --- */
-canvas { filter: drop-shadow(0px 10px 20px rgba(251, 191, 36, 0.15)); }
-
-#map {
-    filter: saturate(1.2) brightness(0.9); /* Makes the greens greener but keeps it from being too bright */
-    border-radius: 15px;
-    overflow: hidden;
+/* Specific fix for high-density displays to prevent overflow */
+@media (max-width: 1200px) {
+    .dashboard-grid, .dashboard-container {
+        grid-template-columns: 200px 1fr 300px !important;
+    }
+    
+    .hero-title {
+        font-size: 0.9rem !important;
+    }
 }

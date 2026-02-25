@@ -1,2 +1,79 @@
 Time,City,Temp,Hum,Press,Wind,ML,API,Report,Mode,Lat,Lon,Proof,Status,Yes_Votes,No_Votes
 2026-02-17 16:01,Gandhinagar,29.99,25,1009,1.54,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 13:12,Philippines,27.24,73,1012,8.19,No Rain,OK,,standard,13,122,,Pending,0,0
+2026-02-18 13:13,Philippines,27.24,73,1012,8.19,No Rain,OK,,standard,13,122,,Pending,0,0
+2026-02-18 14:28,Philippines,27.06,75,1013,8.85,No Rain,OK,,standard,13,122,,Pending,0,0
+2026-02-18 14:29,Philippines,27.06,75,1013,8.85,No Rain,OK,,standard,13,122,,Pending,0,0
+2026-02-18 14:29,Philippines,27.06,75,1013,8.85,No Rain,OK,,standard,13,122,,Pending,0,0
+2026-02-18 14:29,Philippines,27.06,75,1013,8.85,No Rain,OK,,standard,13,122,,Pending,0,0
+2026-02-18 14:29,Philippines,27.06,75,1013,8.85,No Rain,OK,,standard,13,122,,Pending,0,0
+2026-02-18 14:29,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:29,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:31,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:31,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:32,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:35,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:45,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:46,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:46,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:47,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,farmer,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:47,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,construction,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:47,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,farmer,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:50,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,farmer,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:53,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 14:53,Gandhinagar,29.99,26,1010,1.03,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 15:04,Gandhinagar,29.99,25,1009,2.06,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-18 15:04,pune,32.86,20,1009,0.45,No Rain,OK,,standard,18.5196,73.8553,,Pending,0,0
+2026-02-18 15:14,pune,33.41,17,1008,0.45,No Rain,OK,,standard,18.5196,73.8553,,Pending,0,0
+2026-02-18 15:15,pune,33.41,17,1008,0.45,No Rain,OK,,standard,18.5196,73.8553,,Pending,0,0
+2026-02-18 15:20,pune,33.41,17,1008,0.45,No Rain,OK,,standard,18.5196,73.8553,,Pending,0,0
+2026-02-18 15:21,pune,33.41,17,1008,0.45,No Rain,OK,,standard,18.5196,73.8553,,Pending,0,0
+2026-02-18 15:21,pune,33.41,17,1008,0.45,No Rain,OK,,standard,18.5196,73.8553,,Pending,0,0
+2026-02-18 15:21,pune,33.41,17,1008,0.45,No Rain,OK,,standard,18.5196,73.8553,,Pending,0,0
+2026-02-18 16:04,Delhi,17.05,77,1014,2.06,No Rain,OK,,standard,28.6667,77.2167,,Pending,0,0
+2026-02-18 16:07,Delhi,24,77,1014,2.06,No Rain,OK,,standard,28.6667,77.2167,,Pending,0,0
+2026-02-18 16:11,Delhi,24,77,1013,7.4,No Rain,OK,,standard,28.6667,77.2167,,Pending,0,0
+2026-02-21 10:18,Gandhinagar,26,32,1014,12.1,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-21 10:19,Gandhinagar,26,32,1014,12.1,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-21 10:19,Gandhinagar,26,32,1014,12.1,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-21 10:24,Gandhinagar,26,32,1014,12.1,No Rain,OK,,standard,23.2167,72.6833,,Pending,0,0
+2026-02-24 13:15,Surat,33,32,1007.4,5.2,No Rain,OK,,standard,21.19594,72.83023,,Pending,0,0
+2026-02-24 14:10,Surat,33,31,1006.4,4.7,No Rain,OK,,construction,21.19594,72.83023,,Pending,0,0
+2026-02-24 14:11,Surat,33,31,1006.4,4.7,No Rain,OK,,construction,21.19594,72.83023,,Pending,0,0
+2026-02-24 14:12,Gandhinagar,34,24,1004.4,7.6,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+2026-02-24 14:12,Gandhinagar,34,24,1004.4,7.6,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+14:23,Gandhinagar,34,24,1004.2,8.4,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+14:24,Gandhinagar,34,24,1004.2,8.4,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+14:35,Gandhinagar,34,24,1004.1,9.4,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+14:46,Gandhinagar,34,24,1003.9,10.1,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+14:46,Gandhinagar,34,24,1003.9,10.1,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+14:50,Gandhinagar,34,24,1003.9,10.1,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+15:37,Gandhinagar,34,21,1003.1,4.0,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+15:37,Pori,-3,69,1015.4,9.4,No Rain,OK,,construction,61.48333,21.78333,,Pending,0,0
+15:40,Pori,-3,69,1015.4,9.4,No Rain,OK,,construction,61.48333,21.78333,,Pending,0,0
+15:40,Pori,-3,69,1015.4,9.4,No Rain,OK,,construction,61.48333,21.78333,,Pending,0,0
+15:47,Gandhinagar,34,21,1003.0,4.3,No Rain,OK,,construction,23.21667,72.68333,,Pending,0,0
+15:47,Pori,-3,68,1015.6,9.4,No Rain,OK,,construction,61.48333,21.78333,,Pending,0,0
+15:48,Pune,33,23,947.8,9.7,No Rain,OK,,construction,18.51957,73.85535,,Pending,0,0
+15:48,Pune,33,23,947.8,9.7,No Rain,OK,,standard,18.51957,73.85535,,Pending,0,0
+15:53,Pune,33,23,947.8,9.7,No Rain,OK,,standard,18.51957,73.85535,,Pending,0,0
+15:54,Ahmedabad,34,22,1002.2,3.6,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:00,Ahmedabad,34,22,1002.1,3.4,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:12,Ahmedabad,34,22,1002.1,3.4,No Rain,OK,,farmer,23.02579,72.58727,,Pending,0,0
+16:13,Ahmedabad,34,22,1002.1,3.4,No Rain,OK,,construction,23.02579,72.58727,,Pending,0,0
+16:13,Ahmedabad,34,22,1002.1,3.4,No Rain,OK,,construction,23.02579,72.58727,,Pending,0,0
+16:13,Ahmedabad,34,22,1002.1,3.4,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:17,Ahmedabad,34,22,1002.0,2.7,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:25,Ahmedabad,34,22,1002.0,2.7,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:25,Ahmedabad,34,22,1002.0,2.7,No Rain,OK,,construction,23.02579,72.58727,,Pending,0,0
+16:25,Ahmedabad,34,22,1002.0,2.7,No Rain,OK,,farmer,23.02579,72.58727,,Pending,0,0
+16:25,Ahmedabad,34,22,1002.0,2.7,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:27,Ahmedabad,34,22,1002.0,2.7,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:32,Ahmedabad,34,22,1002.0,2.6,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:34,Ahmedabad,34,22,1002.0,2.6,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:36,Ahmedabad,34,22,1002.0,2.6,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+16:37,Ahmedabad,34,22,1002.0,2.6,No Rain,OK,,standard,23.02579,72.58727,,Pending,0,0
+13:21,Gandhinagar,34,27,1006.0,6.3,No Rain,OK,,standard,23.21667,72.68333,,Pending,0,0
+13:22,Gandhinagar,34,27,1006.0,6.3,No Rain,OK,,standard,23.21667,72.68333,,Pending,0,0
+13:26,Gandhinagar,34,27,1006.0,6.3,No Rain,OK,,standard,23.21667,72.68333,,Pending,0,0
+13:27,Gandhinagar,34,27,1006.0,6.3,No Rain,OK,,standard,23.21667,72.68333,,Pending,0,0
