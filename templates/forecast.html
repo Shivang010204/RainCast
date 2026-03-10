@@ -6,22 +6,50 @@
     <title>14-Day Sequence | RainCast AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        body { 
+        /* --- INHERITED DASHBOARD THEME --- */
+        :root {
+            --bg-fallback: #020617;
+            --primary-glow: #00f3ff;
+            --text-dim: rgba(255, 255, 255, 0.5);
+            /* Defaults to sunny, syncs via JS below */
+            --bg-image: url("{{ url_for('static', filename='sunny.jpg') }}");
+        }
+
+        html, body { 
+            height: 100vh; width: 100vw; margin: 0; 
+            background-color: var(--bg-fallback);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        body {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            background-color: var(--bg);
-            overflow-x: hidden;
-            font-family: 'Inter', sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            /* Ultra-light gradient for 90% visibility */
+            background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), var(--bg-image);
+            transition: background 1s ease-in-out;
         }
         
         .container { 
             width: 95%; 
             max-width: 1400px; 
             padding: 20px;
+        }
+
+        /* --- THE INVISIBLE GLASS CARDS --- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.01) !important; /* Matches Dashboard */
+            backdrop-filter: blur(15px) saturate(250%) !important;
+            -webkit-backdrop-filter: blur(15px) saturate(250%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
         /* Horizontal Scroll Wrapper */
@@ -42,9 +70,8 @@
             border-radius: 10px; 
         }
 
-        /* Individual Day Card */
         .day-card {
-            min-width: 160px;
+            min-width: 170px;
             flex: 0 0 auto;
             padding: 30px 20px;
             text-align: center;
@@ -52,23 +79,25 @@
             flex-direction: column;
             align-items: center;
             gap: 15px;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s ease, background 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
 
         .day-card:hover {
             transform: translateY(-10px);
-            border-color: var(--primary-glow);
-            background: rgba(255,255,255,0.05);
+            background: rgba(0, 243, 255, 0.05) !important;
+            border-color: var(--primary-glow) !important;
         }
 
+        /* Top accent line color matched to weather icon */
         .day-card::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
-            background: currentColor; /* Inherits from icon color */
+            top: 0; left: 25%; width: 50%; height: 3px;
+            background: currentColor;
+            box-shadow: 0 0 10px currentColor;
             opacity: 0.6;
+            border-radius: 0 0 5px 5px;
         }
 
         .date-label {
@@ -86,9 +115,9 @@
         }
 
         .icon-box {
-            font-size: 2.5rem;
-            margin: 15px 0;
-            filter: drop-shadow(0 0 10px currentColor);
+            font-size: 2.8rem;
+            margin: 10px 0;
+            filter: drop-shadow(0 0 12px currentColor);
         }
 
         .temp-box {
@@ -98,15 +127,15 @@
             gap: 5px;
         }
 
-        .temp-high { font-size: 1.4rem; font-weight: 700; color: #fff; }
-        .temp-low { font-size: 0.9rem; color: var(--text-dim); }
+        .temp-high { font-size: 1.6rem; font-weight: 700; color: #fff; }
+        .temp-low { font-size: 1rem; color: var(--text-dim); }
 
         .condition-text {
             font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         .header-section {
@@ -159,15 +188,33 @@
             {% endfor %}
         </div>
 
-        <footer style="margin-top: 30px; padding: 20px 15px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+        <footer style="margin-top: 30px; padding: 20px 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
             <p style="font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono';">
-                LAT: {{ session.get('last_lat') }} | LON: {{ session.get('last_lon') }} | SOURCE: VEO_SAT_02
+                SOURCE: VEO_SAT_PROJECTION // LAT_LON_STABLE
             </p>
             <div style="display: flex; gap: 25px; opacity: 0.5;">
-                <i class="fa-solid fa-microchip" title="AI Core Active"></i>
-                <i class="fa-solid fa-shield-halved" title="Connection Encrypted"></i>
+                <i class="fa-solid fa-microchip"></i>
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
         </footer>
     </div>
+
+    <script>
+        // Synchronizes the background photo with the first day's forecast
+        function syncForecastTheme() {
+            const firstDay = "{{ daily[0].condition }}".toLowerCase();
+            const body = document.body;
+            let img = "sunny.jpg";
+
+            if (firstDay.includes("rain") || firstDay.includes("drizzle") || firstDay.includes("storm")) {
+                img = "rain.jpeg";
+            } else if (firstDay.includes("cloud") || firstDay.includes("mist") || firstDay.includes("overcast")) {
+                img = "cloudy.jpeg";
+            }
+
+            body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), url('/static/${img}')`;
+        }
+        window.onload = syncForecastTheme;
+    </script>
 </body>
 </html>

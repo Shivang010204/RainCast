@@ -9,7 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, r2_score, mean_absolute_error
 
 # --- STEP 1 & 2: LOAD DATA ---
-df = pd.read_csv('prediction_history.csv')
+df = pd.read_csv('data/prediction_history.csv')
 
 # --- STEP 3: DATA CLEANING ---
 df['Time'] = pd.to_datetime(df['Time'])
@@ -69,9 +69,9 @@ print(f"R2 Score: {r2_score(y_test_r, dt_reg.predict(X_test_r)):.4f}")
 print(f"MAE: {mean_absolute_error(y_test_r, dt_reg.predict(X_test_r)):.4f}\n")
 
 # --- SAVE MODELS FOR FLASK ---
-joblib.dump(clf_model, 'rain_classifier.pkl')
-joblib.dump(lin_reg, 'temp_regressor.pkl')
-joblib.dump(le_city, 'city_encoder.pkl')
-joblib.dump(le_mode, 'mode_encoder.pkl')
+joblib.dump(clf_model, 'model/rain_classifier.pkl')
+joblib.dump(lin_reg, 'model/temp_regressor.pkl')
+joblib.dump(le_city, 'model/city_encoder.pkl')
+joblib.dump(le_mode, 'model/mode_encoder.pkl')
 
-print("✅ All models and encoders saved successfully!")
+print("✅ All models and encoders saved to 'model/' successfully!")

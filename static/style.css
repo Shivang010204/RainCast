@@ -1,170 +1,73 @@
+/* --- UPDATED FOR MAX TRANSPARENCY & AESTHETICS --- */
 :root {
-    --bg-image: url('https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
-    --glass-bg: rgba(25, 30, 40, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --primary-glow: #00d4ff;
-    --accent-red: #ff5f5f;
-    --accent-green: #4ade80;
-    --text-main: #ffffff;
-    --text-dim: #94a3b8;
+    --bg-image: url("{{ url_for('static', filename='sunny.jpg') }}");
+    --primary-glow: #00f3ff;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), var(--bg-image);
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), var(--bg-image);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    color: var(--text-main);
-    font-family: 'Inter', sans-serif;
-    overflow-x: hidden;
+    transition: background 1.5s ease-in-out;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden; /* Keeps the terminal look locked */
 }
 
-/* --- SEARCH INPUT FIX --- */
-input[type="text"] {
-    background: rgba(0, 0, 0, 0.3) !important;
-    border: 1px solid var(--glass-border) !important;
-    color: white !important;
-    transition: 0.3s;
+/* Unified Glass Style */
+.glass-panel, .intel-widget, .main-display form {
+    background: rgba(255, 255, 255, 0.08) !important; 
+    backdrop-filter: blur(25px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Prevents the "bad white box" look when clicking to search */
-input[type="text"]:focus {
-    background: rgba(0, 0, 0, 0.5) !important;
-    outline: none !important;
-    border-color: var(--primary-glow) !important;
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+/* Map specific adjustment to prevent tile clipping */
+/* Update your CSS to include this specifically for the map */
+#map { 
+    height: 180px; 
+    width: 100%; 
+    border-radius: 15px; 
+    z-index: 10 !important; /* Force it to the front */
+    background: #0a0a0a; /* Fallback if tiles take a second to load */
+    overflow: hidden;
+    position: relative;
 }
 
-/* --- THE CORE GLASS CARD --- */
-.glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(15px) saturate(180%);
-    -webkit-backdrop-filter: blur(15px) saturate(180%);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    transition: 0.3s ease;
-    position: relative; /* Ensures z-index works */
+/* Ensure the Leaflet tiles themselves aren't blurred */
+.leaflet-container {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
-.glass-card:hover {
-    border-color: var(--primary-glow);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-}
-
-/* --- PREVENT BOX COLLISIONS --- */
-/* This ensures the middle column elements stack correctly without overlapping */
-.center-column {
+/* Intelligence Widgets (Humidity/Wind) */
+.intel-widget {
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-
-/* Force the Hourly box to stay in place and not go behind the ML prediction */
-.hourly-scroll {
-    z-index: 5;
-    order: 1; /* Always first below search */
-}
-
-.prediction-hero {
-    z-index: 4;
-    order: 2; /* Always below hourly */
-}
-
-.peer-review-box {
-    z-index: 3;
-    order: 3; /* Always below prediction */
-    animation: slideDown 0.4s ease-out;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- BUTTONS --- */
-.mode-btn {
-    padding: 12px 20px;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
-    background: rgba(255,255,255,0.05);
-    color: white;
-    cursor: pointer;
-    text-decoration: none;
-    display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
-    transition: 0.2s;
+    text-align: center;
 }
 
-.mode-btn.active {
+/* Pulsing Status for Rain Predictions */
+.status-glow {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+    animation: glow-pulse 2s infinite alternate;
+}
+
+@keyframes glow-pulse {
+    from { text-shadow: 0 0 5px var(--primary-glow); }
+    to { text-shadow: 0 0 20px var(--primary-glow), 0 0 30px var(--primary-glow); }
+}
+
+.mode-btn:active {
+    transform: scale(0.95);
     background: var(--primary-glow);
     color: black;
-    font-weight: 700;
-}
-
-.btn-yes { background: var(--accent-green) !important; color: black !important; font-weight: 800; border: none !important; }
-.btn-no { background: var(--accent-red) !important; color: white !important; font-weight: 800; border: none !important; }
-
-/* --- MAP STYLING --- */
-#map { 
-    border: 1px solid var(--glass-border);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-}
-
-/* --- LAYOUT WRAPPER --- */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 280px 1fr 300px;
-    gap: 20px;
-    padding: 20px;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-
-
-
-/* --- RESPONSIVE FIXES FOR NO-SCROLL LAYOUT --- */
-
-/* Adjustments for smaller laptop screens */
-@media (max-height: 850px) {
-    .big-temp { 
-        font-size: 3.5rem !important; 
-        margin: 5px 0 !important;
-    }
-    
-    #map { 
-        height: 130px !important; 
-    }
-    
-    .intel-widget h3 { 
-        font-size: 1.3rem !important; 
-    }
-
-    .dashboard-container {
-        gap: 10px !important;
-        padding: 10px !important;
-    }
-
-    .glass-panel {
-        padding: 10px !important;
-    }
-    
-    .ios-widget {
-        padding: 10px !important;
-    }
-}
-
-/* Specific fix for high-density displays to prevent overflow */
-@media (max-width: 1200px) {
-    .dashboard-grid, .dashboard-container {
-        grid-template-columns: 200px 1fr 300px !important;
-    }
-    
-    .hero-title {
-        font-size: 0.9rem !important;
-    }
 }
