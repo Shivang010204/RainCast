@@ -89,6 +89,7 @@ async def index():
                 p = w_data["main"]["pressure"]
                 w = round(w_data["wind"]["speed"] * 3.6, 1)
                 vis = round(w_data.get("visibility", 0) / 1000, 1)
+                fl = round(w_data["main"].get("feels_like", t))
                 condition_id = w_data["weather"][0]["id"]
 
                 curr_hour_str = datetime.now().strftime("%Y-%m-%dT%H:00")
@@ -113,7 +114,7 @@ async def index():
                 from app import get_ai_prediction
                 prediction, ai_temp = get_ai_prediction(t, h, p, w, full_name, current_mode)
                 
-                weather = {"city": full_name, "temp": t, "hum": h, "wind": w, "pressure": p, "visibility": vis, "lat": lat, "lon": lon, "ai_temp": ai_temp, "aqi": aqi}
+                weather = {"city": full_name, "temp": t, "hum": h, "wind": w, "pressure": p, "visibility": vis, "lat": lat, "lon": lon, "ai_temp": ai_temp, "aqi": aqi, "feels_like": fl}
                 advice = generate_advice(t, h, w, prediction, current_mode, condition_id, aqi)
                 
                 session['last_city'], session['last_lat'], session['last_lon'] = full_name, lat, lon
