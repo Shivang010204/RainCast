@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, session, flash, redirect, url_for
 import requests, os, asyncio, aiohttp
-from datetime import datetime
+from datetime import datetime, timedelta
 
 main_bp = Blueprint('main', __name__)
 
@@ -116,6 +116,18 @@ async def index():
                 
                 weather = {"city": full_name, "temp": t, "hum": h, "wind": w, "pressure": p, "visibility": vis, "lat": lat, "lon": lon, "ai_temp": ai_temp, "aqi": aqi, "feels_like": fl}
                 advice = generate_advice(t, h, w, prediction, current_mode, condition_id, aqi)
+                
+                from models import P2PReport
+                recent_time = datetime.utcnow() - timedelta(hours=1)
+                verified_report = P2PReport.query.filter(
+                    P2PReport.city == full_name,
+                    P2PReport.status == "verified",
+                    P2PReport.timestamp >= recent_time
+                ).order_by(P2PReport.timestamp.desc()).first()
+                
+                if verified_report:
+                    prediction = f"Verified {verified_report.report_type} (Peer Consensus)"
+                    advice['dos'] = f"⚠️ Nearby user reported {verified_report.report_type} - Verified by 5 locals. " + advice['dos']
                 
                 session['last_city'], session['last_lat'], session['last_lon'] = full_name, lat, lon
             else:

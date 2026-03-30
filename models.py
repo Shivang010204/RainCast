@@ -8,6 +8,9 @@ class P2PReport(db.Model):
     city = db.Column(db.String(100), nullable=False)
     report_type = db.Column(db.String(50), nullable=False) # 'Rain' or 'Clear'
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default="pending") # 'pending', 'verified', 'rejected'
+    votes_yes = db.Column(db.Integer, default=0)
+    votes_no = db.Column(db.Integer, default=0)
 
 class PredictionHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -179,6 +179,17 @@
     </aside>
 </div>
 
+<!-- P2P Voting Modal UI -->
+<div id="p2p-backdrop" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:99; backdrop-filter:blur(5px);" onclick="closeP2PModal()"></div>
+<div id="p2p-modal" class="glass-panel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:100; max-width:400px; text-align:center;">
+    <h3 style="color:#00f3ff; margin-top:0;"><i class="fa-solid fa-satellite-dish status-pulse"></i> Intel Verification</h3>
+    <p style="font-size:0.9rem;">A nearby user reported it is currently <strong id="p2p-modal-type" style="color:white; text-transform:uppercase;"></strong>. Can you confirm this?</p>
+    <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+        <button class="mode-btn" style="color:#10b981; flex:1;" onclick="submitP2PVote('yes')">YES</button>
+        <button class="mode-btn" style="color:#ff4d4d; flex:1;" onclick="submitP2PVote('no')">NO</button>
+    </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     // 0. Loading State
@@ -195,11 +206,10 @@
         }
     }, 1000);
 
-    // 2. Map Engine (Dark Mode Fixed)
+    // 2. Map Engine
     {% if weather %}
     var map = L.map('map', {zoomControl: false, attributionControl: false}).setView([{{ weather.lat }}, {{ weather.lon }}], 11);
     
-    // Using Standard map tiles to match the UI aesthetics
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
     
     L.circleMarker([{{ weather.lat }}, {{ weather.lon }}], {
@@ -223,7 +233,7 @@
     }
     window.onload = updateBG;
 
-    // 4. Chart Engine (Fixed Scale Conflicts)
+    // 4. Chart Engine
     {% if hourly_data %}
     new Chart(document.getElementById('weatherChart'), {
         type: 'line',
@@ -256,7 +266,7 @@
     });
     {% endif %}
 
-    // 5. P2P Submission Logic
+    // 5. P2P Submission Engine
     function updateFileLabel(input) {
         if(input.files[0]) document.getElementById('file-label').innerText = "Photo Ready";
     }
@@ -277,6 +287,45 @@
         const result = await response.json();
         alert(result.message);
     }
+
+    // 6. P2P Peer Polling Engine
+    let pendingReportId = null;
+
+    function closeP2PModal() {
+        document.getElementById('p2p-modal').style.display = 'none';
+        document.getElementById('p2p-backdrop').style.display = 'none';
+    }
+
+    async function submitP2PVote(voteType) {
+        if (!pendingReportId) return;
+        const res = await fetch(`/vote/${pendingReportId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({vote: voteType})
+        });
+        const data = await res.json();
+        closeP2PModal();
+        if (voteType === 'yes') {
+            alert(data.message + " Thanks for keeping the network accurate!");
+        }
+    }
+
+    {% if weather %}
+    setTimeout(async () => {
+        const city = "{{ weather.city }}";
+        const res = await fetch(`/pending_report/${city}`);
+        const data = await res.json();
+        
+        if (data.exists && !localStorage.getItem(`voted_${data.id}`)) {
+            pendingReportId = data.id;
+            document.getElementById('p2p-modal-type').innerText = data.report_type;
+            document.getElementById('p2p-backdrop').style.display = 'block';
+            document.getElementById('p2p-modal').style.display = 'flex';
+            // prevent voting repeatedly
+            localStorage.setItem(`voted_${data.id}`, "true");
+        }
+    }, 1500);
+    {% endif %}
 </script>
 </body>
 </html>
