@@ -13,17 +13,27 @@ temp_model = None
 rain_model = None
 le_city = None
 le_mode = None
+dl_scaler = None
 
 MODEL_REG_PATH = "model/temp_regressor.pkl"
 MODEL_CLF_PATH = "model/rain_classifier.pkl"
 LE_CITY_PATH = "model/city_encoder.pkl"
 LE_MODE_PATH = "model/mode_encoder.pkl"
+DL_MODEL_PATH = "model/rain_dl_model.keras"
+DL_SCALER_PATH = "model/dl_scaler.pkl"
 
 try:
     temp_model = joblib.load(MODEL_REG_PATH)
-    rain_model = joblib.load(MODEL_CLF_PATH)
     le_city = joblib.load(LE_CITY_PATH)
     le_mode = joblib.load(LE_MODE_PATH)
+    
+    if os.path.exists(DL_MODEL_PATH):
+        from tensorflow.keras.models import load_model
+        rain_model = load_model(DL_MODEL_PATH)
+        dl_scaler = joblib.load(DL_SCALER_PATH)
+    else:
+        rain_model = joblib.load(MODEL_CLF_PATH)
+        
     models_loaded = True
 except Exception as e:
     print(f"Model Load Warning: {e}")
@@ -36,9 +46,15 @@ def get_ai_prediction(temp, hum, press, wind, city_name, mode_name):
         try: m_code = le_mode.transform([mode_name])[0]
         except: m_code = 0
             
-        rain_features = [[temp, hum, press, wind, c_code]]
-        is_rain = rain_model.predict(rain_features)[0]
-        prediction_text = "Rain Expected" if is_rain == 1 else "No Rain"
+        if dl_scaler is not None:
+            raw_features = [[temp, hum, press, wind, c_code]]
+            scaled_features = dl_scaler.transform(raw_features)
+            dl_prob = rain_model.predict(scaled_features, verbose=0)[0][0]
+            prediction_text = "Rain Expected" if dl_prob > 0.50 else "No Rain"
+        else:
+            rain_features = [[temp, hum, press, wind, c_code]]
+            is_rain = rain_model.predict(rain_features)[0]
+            prediction_text = "Rain Expected" if is_rain == 1 else "No Rain"
         
         temp_features = [[hum, press, wind, c_code, m_code]]
         ml_guess = temp_model.predict(temp_features)[0]
